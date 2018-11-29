@@ -1,0 +1,67 @@
+<nav class="sticky-top">
+  <mat-toolbar style="background:inherit">
+    <span class="logo">TASK LIST</span>
+    <span class="nav-spacer"></span>
+    <button class="nav-btn" mat-stroked-button color="">Login</button>
+  </mat-toolbar>
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</nav>
+
+
+<div class="row justify-content-around align-items-center m-0 main-section">
+  <div class="col-auto">
+    <div class="row justify-content-center">
+      <img src="./../assets/images/task.png">
+    </div>
+    <div class="row justify-content-center">
+      <span class="col-auto display-4" style="font-size:2rem">Create and manage tasks with friends</span>
+    </div>
+    <div class="row mt-4 justify-content-center">
+      <div class="col-auto g-signin2" data-onsuccess="onSignIn"></div>
+    </div>
+  </div>
+  <mat-card class="example-card col-auto">
+    <mat-card-header>
+      <mat-card-title>Create new account</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <form class="container">
+        <div class="row">
+          <mat-form-field class="col-6">
+            <input matInput placeholder="First Name">
+          </mat-form-field>
+          <mat-form-field class="col-6">
+            <input matInput placeholder="Last Name">
+          </mat-form-field>
+        </div>
+        <div class="row">
+          <mat-form-field class="col-4">
+            <input type="number" matInput placeholder="Country code">
+          </mat-form-field>
+          <mat-form-field class="col-8">
+            <input type="number" matInput placeholder="Mobile">
+          </mat-form-field>
+        </div>
+        <div class="row">
+          <mat-form-field class="col">
+            <input matInput placeholder="Email">
+          </mat-form-field>
+        </div>
+      </form>
+    </mat-card-content>
+    <mat-card-actions>
+      <button class="sing-up-btn" mat-flat-button color="">SIGN UP</button>
+    </mat-card-actions>
+  </mat-card>
+</div>
+
+
+<router-outlet></router-outlet>
+
+<footer>
+  <mat-toolbar color=''>
+    <span style="letter-spacing: 1px">By Nitin Shokeen</span>
+    <span class="nav-spacer"></span>
+    <button class="nav-btn" mat-stroked-button color="">Githu Repository</button>
+  </mat-toolbar>
+</footer>
