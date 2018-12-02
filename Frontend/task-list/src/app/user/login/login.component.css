@@ -1,0 +1,51 @@
+.main-section{
+    height:90vh;
+    background-color:rgba(245, 245, 245, 0.39);
+  }
+
+  mat-card-title{
+      letter-spacing: 0.8px
+  }
+
+  mat-form-field{
+      /* padding-right: 0.2rem;
+      padding-left: 0.2rem */
+  }
+
+  .line{
+      height: inherit;
+      border-left: 1px solid lightgrey;
+      position: relative;
+  }
+
+  .or{
+      position: absolute;
+      top: 50%;
+      left: -11px;
+      transform: translateY(-16px);
+      color:#9E9E9E;
+      background-color: red;
+      background-color: #FAFAFA;
+      font-size: small;
+      letter-spacing: 2px
+  }
+
+  .login-btn{
+    position: absolute;
+    bottom: -5%;
+    left: 50%;
+    transform: translateX(-45px);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0rem 1rem;
+    letter-spacing: 1px;
+    background-color:#c8cef3;
+    color: #3f51b5;
+    box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
+    transition: all 0.3s ease;
+}
+
+  .login-btn:hover{
+    background-color:#b1b9eb;
+    /* color: #b8c0ec; */
+  }

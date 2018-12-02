@@ -1,0 +1,44 @@
+.example-card {
+    max-width: 400px;
+    position: relative
+  }
+  
+  .main-section{
+    height:90vh;
+    background-color:rgba(245, 245, 245, 0.39);
+    /* background-image: linear-gradient(to right top, #3664a6, #3460ab, #345caf, #3857b2, #3f51b5); */
+    /* background-image: linear-gradient(to right top, #3f4db5, #3f4eb5, #3f4fb5, #3f50b5, #3f51b5); */
+  }
+
+  img {
+      height: 10vh;
+  }
+
+
+  mat-card-title{
+      letter-spacing: 0.8px
+  }
+
+  mat-form-field{
+      /* padding-right: 0.2rem;
+      padding-left: 0.2rem */
+  }
+
+  .sing-up-btn{
+    position: absolute;
+    bottom: -5%;
+    left: 5%;
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0rem 1rem;
+    letter-spacing: 1px;
+    background-color:#c8cef3;
+    color: #3f51b5;
+    box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
+    transition: all 0.3s ease;
+}
+
+  .sing-up-btn:hover{
+    background-color:#b1b9eb;
+    /* color: #b8c0ec; */
+  }

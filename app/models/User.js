@@ -23,8 +23,7 @@ let userSchema = new Schema({
     trim: true
   },
   password: {
-    type: String,
-    select: false
+    type: String
   },
   email: {
     type: String,

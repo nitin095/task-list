@@ -1,0 +1,20 @@
+.container{
+    height: 90vh
+}
+h1{
+    word-spacing: 15px
+}
+.button{
+    padding: 0.5rem 1rem !important;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 0rem 1rem;
+    letter-spacing: 1px;
+    background-color:#c8cef3;
+    color: #3f51b5;
+    box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
+    transition: all 0.3s ease;
+}
+.button:hover{
+    background-color:#b1b9eb;
+}
