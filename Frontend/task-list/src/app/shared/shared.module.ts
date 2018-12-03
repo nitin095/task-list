@@ -18,6 +18,8 @@ import {
   MatMenuModule,
   MatSnackBarModule,
   MatTooltipModule,
+  MatSidenavModule,
+  MatListModule
 } from '@angular/material';
 import { GoogleBtnComponent } from './google-btn/google-btn.component';
 
@@ -52,7 +54,9 @@ import { GoogleBtnComponent } from './google-btn/google-btn.component';
     MatAutocompleteModule,
     MatMenuModule,
     MatSnackBarModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatSidenavModule,
+    MatListModule
   ]
 })
 export class SharedModule { }

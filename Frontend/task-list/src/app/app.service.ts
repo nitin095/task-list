@@ -9,21 +9,21 @@ import { Cookie } from 'ng2-cookies/ng2-cookies';
 export class AppService {
 
   private baseUrl = 'http://localhost:3000/api/v1';
-  
+
   private authToken: string = Cookie.get('authtoken');
 
 
   constructor(private _http: HttpClient) {
     console.log('app-service called');
   }
-  
+
   private handleError(err: HttpErrorResponse) {
     console.log("Handle error Http calls")
     console.log(err.message);
     return Observable.throw(err.message)
   }
 
-  
+
   public getUserInfoFromLocalstorage = () => {
     return JSON.parse(localStorage.getItem('userInfo'));
   }
@@ -76,5 +76,37 @@ export class AppService {
     return response
   }
 
+
+  getAllLists(userId): Observable<any> {
+    this.authToken = Cookie.get('authtoken');
+    let response = this._http.get(`${this.baseUrl}/lists/all/${userId}?authToken=${this.authToken}`)
+    return response
+  }
+
+  createList(listData): Observable<any> {
+    let response = this._http.post(`${this.baseUrl}/lists/create`, listData)
+    return response
+  }
+
+  getSingleList(listId): Observable<any> {
+    let response = this._http.get(`${this.baseUrl}/lists/${listId}/details`)
+    return response
+  }
+
+  editList(listId,data): Observable<any> {
+    let response = this._http.put(`${this.baseUrl}/lists/${listId}/edit`,data)
+    return response
+  }
+
+  getListTasks(listId): Observable<any> {
+    let response = this._http.get(`${this.baseUrl}/tasks/list/${listId}`)
+    return response
+  }
+
+  createTask(taskData): Observable<any> {
+    let response = this._http.post(`${this.baseUrl}/tasks/create`, taskData)
+    return response
+  }
+  
 
 }

@@ -55,6 +55,10 @@ let taskSchema = new Schema({
         index: true,
         unique: true
     },
+    listId: {
+        type: String,
+        required: true
+    },
     title: {
         type: String,
         required: true,

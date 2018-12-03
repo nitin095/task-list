@@ -46,7 +46,7 @@ let createList = (req, res) => {
 // Get all list details 
 let getAllLists = (req, res) => {
 
-    listModel.find()
+    listModel.find({"createdBy": req.params.userId})
         .select(' -__v -_id')
         .lean()
         .exec((err, result) => {

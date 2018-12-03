@@ -1,3 +1,5 @@
+<mat-progress-bar mode="indeterminate" [style.opacity]="showProgressBar == true ? '1': '0'"></mat-progress-bar>
+
 <div class="row justify-content-around align-items-center m-0 main-section">
   <div class="col-auto">
     <div class="row justify-content-center">
@@ -28,18 +30,18 @@
         </div>
 
         <div class="row">
-          <mat-form-field class="col-4">
+          <mat-form-field class="col-6">
             <span matPrefix>+&nbsp;</span>
             <input type="text" name="code" placeholder="Country code" aria-label="code" required matInput [formControl]="codeFormControl"
               [(ngModel)]="countryCode" [matAutocomplete]="auto">
             <mat-autocomplete #auto="matAutocomplete">
-              <mat-option *ngFor="let option of filteredOptions | async" [value]="option.code">
+              <mat-option *ngFor="let option of filteredOptions | async" [value]="option.code" matTooltip="+{{option.code}} {{option.country}}">
                 <small><img src="https://restcountries.eu/data/{{option.iso}}.svg" style="height:1rem;width:1.5rem">
                   {{option.country}} {{option.code}}</small>
               </mat-option>
             </mat-autocomplete>
           </mat-form-field>
-          <mat-form-field class="col-8">
+          <mat-form-field class="col-6">
             <input matInput name="mobile" placeholder="Mobile" type="number" required [(ngModel)]="mobile" class="">
           </mat-form-field>
         </div>
@@ -69,7 +71,7 @@
       </form>
     </mat-card-content>
     <mat-card-actions>
-      <button class="sing-up-btn" mat-flat-button (click)="signUp()">SIGN UP</button>
+      <button class="sing-up-btn" mat-flat-button (click)="showProgressBar=true;signUp()">SIGN UP</button>
     </mat-card-actions>
   </mat-card>
 

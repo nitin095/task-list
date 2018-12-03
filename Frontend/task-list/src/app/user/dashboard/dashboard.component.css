@@ -1,3 +1,70 @@
-.container{
-    height: 90vh
+mat-drawer-container{
+    height:90vh;
+}
+.main-row{
+    /* outline: 2px solid red;  */
+    /* height: 90vh */
+}
+.side-nav-col{
+    background: whitesmoke;
+    cursor: default
+}
+button:focus{
+outline: none
+}
+.vh10{
+    height: 8vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* background: lightblue; */
+    /* outline: 1px solid red; */
+}
+.flex-center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.vh10:hover{
+    background: rgba(207, 226, 252, 0.904)
+}
+mat-drawer {
+    min-width: 15vw;
+    background: whitesmoke;
+    cursor: default;
+}
+mat-drawer span{
+    /* font-size: 1.2rem; */
+    /* outline: 1px solid green; */
+    padding-bottom: 0.1rem;
+    padding-right: 2rem;
+    padding-left: 0.5rem;
+}
+.new-list-link input{
+    background: none;
+    border: none;
+}
+.new-list-link input:focus{
+    outline: none
+}
+.new-list-link input::placeholder{
+    color: rgb(0, 110, 255)
+}
+.new-list-link input:focus::placeholder{
+    color: grey
+}
+mat-list{
+    width: 100%;
+    padding: 0.5rem 1rem
+}
+.task-list-item:hover{
+    background-color: whitesmoke
+}
+.note-input{
+    border: none;
+    background: none;
+    width: 100%
+}
+.note-input:focus{
+    outline: none
 }

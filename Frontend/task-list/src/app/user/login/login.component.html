@@ -1,3 +1,4 @@
+<mat-progress-bar mode="indeterminate" *ngIf="showProgressBar" [style.opacity]="showProgressBar == true ? '1': '0'"></mat-progress-bar>
 <div class="container">
   <div class="row main-section justify-content-around align-items-center">
     <div class="col">
@@ -13,12 +14,12 @@
             <form class="container">
               <div class="row">
                 <mat-form-field class="col">
-                    <input matInput placeholder="Email" name='email' required [(ngModel)]="email">
+                  <input matInput placeholder="Email" name='email' required [(ngModel)]="email">
                 </mat-form-field>
               </div>
               <div class="row">
                 <mat-form-field class="col">
-                    <input matInput placeholder="Password" name="password" required [type]="hide ? 'password' : 'text'"
+                  <input matInput placeholder="Password" name="password" required [type]="hide ? 'password' : 'text'"
                     [(ngModel)]="password">
                   <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
                 </mat-form-field>
@@ -26,7 +27,7 @@
             </form>
           </mat-card-content>
           <mat-card-actions>
-            <button class="login-btn" mat-flat-button (click)="login()">LOGIN</button>
+            <button class="login-btn" mat-flat-button (click)="showProgressBar=true;login()">LOGIN</button>
           </mat-card-actions>
         </mat-card>
 
@@ -44,6 +45,10 @@
             </div>
           </mat-card-content>
         </mat-card>
+      </div>
+      <div class="row justify-content-center no-gutters">
+        <span class="lead mt-5" style="font-size:1rem">Don't have a account?<button mat-button color="primary"
+            [routerLink]="['/home']" (click)="reload()">Signup</button> </span>
       </div>
     </div>
   </div>

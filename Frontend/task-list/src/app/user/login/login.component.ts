@@ -12,6 +12,8 @@ import { Cookie } from 'ng2-cookies/ng2-cookies';
 })
 export class LoginComponent implements OnInit {
 
+  showProgressBar: Boolean = false;
+
   //models
   public email: String;
   public password: String;
@@ -21,6 +23,10 @@ export class LoginComponent implements OnInit {
 
   ngOnInit() {
 
+  }
+
+  reload() {
+    window.location.reload();
   }
 
   login(): any {
@@ -47,16 +53,19 @@ export class LoginComponent implements OnInit {
           this.appService.setUserInfoInLocalStorage(response.data.userDetails ? response.data.userDetails : response.data.adminDetails)
 
           setTimeout(() => {
+            this.showProgressBar = false;
             this.router.navigate(['/dashboard']);
           }, 1000)
 
         } else {
-          this.snackBar.open(response.message, 'Close', { verticalPosition: 'top', horizontalPosition: 'end', duration: 4000, });
+          this.snackBar.open(response.message, 'Close', { duration: 4000, });
+          this.showProgressBar = false;
           console.log(response.message)
         }
       },
       error => {
-        this.snackBar.open(error.error.message, 'Close', { verticalPosition: 'top', horizontalPosition: 'end', duration: 4000, });
+        this.snackBar.open(error.error.message, 'Close', { duration: 4000, });
+        this.showProgressBar = false;
         console.log("some error occured");
         console.log(error)
       }

@@ -11,7 +11,7 @@ module.exports.setRouter = (app) => {
 
     // defining routes.
 
-    app.get(`${baseUrl}/all`, listController.getAllLists);
+    app.get(`${baseUrl}/all/:userId`, listController.getAllLists);
 
     /**
 	 * @api {get} /api/v1/lists/view/all Get all lists

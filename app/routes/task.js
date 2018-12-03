@@ -48,6 +48,44 @@ module.exports.setRouter = (app) => {
 	 */
 
 
+
+	app.get(`${baseUrl}/list/:listId`, taskController.getListTasks);
+
+    /**
+	 * @api {get} /api/v1/tasks/view/all Get all tasks
+	 * @apiVersion 0.0.1
+	 * @apiGroup read
+	 *
+	 * @apiParam {String} authToken The token for authentication.(Send authToken as query parameter, body parameter or as a header)
+	 *
+	 *  @apiSuccessExample {json} Success-Response:
+	 *  {
+	    "error": false,
+	    "message": "All Task Details Found",
+	    "status": 200,
+	    "data": [
+					{
+						taskId: "string",
+						firstName: "string",
+						lastName: "string",
+                        email: "string",
+                        countryCode: number,
+						moile: number,
+						lastModified: "date"
+					}
+	    		]
+	    }
+	  @apiErrorExample {json} Error-Response:
+	 *
+	 * {
+	    "error": true,
+	    "message": "Failed To Find Task Details",
+	    "status": 500,
+	    "data": null
+	   }
+	 */
+
+
 	app.get(`${baseUrl}/:taskId/details`, taskController.getSingleTask);
 
     /**

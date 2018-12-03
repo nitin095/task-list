@@ -11,53 +11,75 @@ const mailer = require('../libs/mailer')
 
 // Models 
 const taskModel = mongoose.model('Task')
+const listModel = mongoose.model('List')
 
 // Create task 
 let createTask = (req, res) => {
 
-    let newTask = () => {
+    let taskId = shortid.generate();
 
+    let addTaskToList = () => {
         return new Promise((resolve, reject) => {
-            if (check.isEmpty(req.body.title)) {
+            if (check.isEmpty(req.body.title && req.body.listId)) {
                 let apiResponse = response.generate(true, 'required parameters are missing', 403, null)
                 reject(apiResponse)
             } else {
-                let taskId = shortid.generate()
-                let newTask = new taskModel({
-                    taskId: taskId,
-                    createdBy: req.body.createdBy,
-                    title: req.body.title,
-                    // dueDate: req.body.dueDate
-                }) // end new task model
+                listModel.findOneAndUpdate({ "listId": req.body.listId },
+                    { $push: { tasks: taskId } },
+                    (error, result) => {
+                        if (error) {
+                            logger.error(`Error Occured : ${error}`, 'Database', 10)
+                            let apiResponse = response.generate(true, 'Error Occured.', 500, null)
+                            res.send(apiResponse)
+                            reject(error)
+                        } else {
+                            resolve()
+                        }
+                    });
+            }
+        })
+    }// end addTaskToList
 
-                let assignees = (req.body.assignees != undefined && req.body.assignees != null && req.body.assignees != '') ? req.body.assignees.split(',') : [];
-                newTask.assignees = assignees;
+    let newTask = () => {
 
-                newTask.save((err, result) => {
-                    if (err) {
-                        console.log('Error Occured.')
-                        logger.error(`Error Occured : ${err}`, 'Database', 10)
-                        let apiResponse = response.generate(true, 'Error Occured.', 500, null)
-                        reject(apiResponse)
-                    } else {
-                        console.log('Success in task creation')
-                        resolve(result)
-                    }
-                }) // end newMeeting save
-            }// end else
-        }) // end new Meeting promise
+        return new Promise((resolve, reject) => {
+            let newTask = new taskModel({
+                taskId: taskId,
+                listId: req.body.listId,
+                createdBy: req.body.createdBy,
+                title: req.body.title,
+            }) // end new task model
 
-    } // end newMeeting function
+            let assignees = (req.body.assignees != undefined && req.body.assignees != null && req.body.assignees != '') ? req.body.assignees.split(',') : [];
+            newTask.assignees = assignees;
+
+            newTask.save((err, result) => {
+                if (err) {
+                    console.log('Error Occured.')
+                    logger.error(`Error Occured : ${err}`, 'Database', 10)
+                    let apiResponse = response.generate(true, 'Error Occured.', 500, null)
+                    reject(apiResponse)
+                } else {
+                    console.log('Success in task creation')
+                    resolve(result)
+                }
+            }) // end newTask save
+        }) // end promise
+
+    } // end newTask function
 
     // promise call
-    newTask()
+    addTaskToList()
+        .then(newTask)
         .then((result) => {
             let apiResponse = response.generate(false, 'Task Created successfully', 200, result);
             res.send(apiResponse);
         })
-        .catch((error) => {
-            console.log(error)
-            res.send(error)
+        .catch((err) => {
+            console.log("error handler");
+            console.log(err);
+            res.status(err.status)
+            res.send(err)
         })
 
 }// end create task
@@ -82,7 +104,7 @@ let createSubTask = (req, res) => {
             (error, result) => {
                 if (error) {
                     console.log('Error Occured.')
-                    logger.error(`Error Occured : ${err}`, 'Database', 10)
+                    logger.error(`Error Occured : ${error}`, 'Database', 10)
                     let apiResponse = response.generate(true, 'Error Occured.', 500, null)
                     res.send(apiResponse);
                 } else {
@@ -189,6 +211,29 @@ let getAllTasks = (req, res) => {
 
 }// end get all tasks
 
+// Get all List tasks
+let getListTasks = (req, res) => {
+    let filter = req.query.fields ? req.query.fields.replace(new RegExp(";", 'g'), " ") : '';
+    // taskModel.find({ 'createdBy': req.query.userId })
+    taskModel.find({ listId: req.params.listId })
+        .select(`-__v ${filter}`)
+        .lean()
+        .exec((err, result) => {
+            if (err) {
+                console.log(err)
+                logger.error(err.message, 'Task Controller: getListTasks', 10)
+                let apiResponse = response.generate(true, 'Failed To Find Task Details', 500, null)
+                res.send(apiResponse)
+            } else if (check.isEmpty(result)) {
+                logger.info('No Task Found', 'Task Controller: getListTasks')
+                let apiResponse = response.generate(true, 'No Task Found', 404, null)
+                res.send(apiResponse)
+            } else {
+                let apiResponse = response.generate(false, 'All Task Details Found', 200, result)
+                res.send(apiResponse)
+            }
+        })
+}// end get all list tasks
 
 // Get single task details 
 let getSingleTask = (req, res) => {
@@ -266,7 +311,7 @@ let editComment = (req, res) => {
 let editSubTaskComment = (req, res) => {
 
     taskModel.updateOne({ 'taskId': req.params.taskId, 'subTask._id': req.body.subTask_id },
-    { $set: { 'subTask.$.comments': { body: req.body.body } } },  function (err, result) {
+        { $set: { 'subTask.$.comments': { body: req.body.body } } }, function (err, result) {
             if (err) {
                 console.log(err)
                 logger.error(err.message, 'task Controller: editSubTaskComment', 10)
@@ -360,6 +405,7 @@ module.exports = {
     createTaskComment: createTaskComment,
     createSubTaskComment: createSubTaskComment,
     getAllTasks: getAllTasks,
+    getListTasks: getListTasks,
     getSingleTask: getSingleTask,
     editTask: editTask,
     editComment: editComment,
