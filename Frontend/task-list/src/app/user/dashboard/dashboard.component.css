@@ -53,12 +53,19 @@ mat-drawer span{
 .new-list-link input:focus::placeholder{
     color: grey
 }
+.list-header{
+    background: whitesmoke
+}
 mat-list{
     width: 100%;
-    padding: 0.5rem 1rem
+    padding: 0.5rem 1rem;
+}
+.task-list-item{
+    transition: all 0.2s ease
 }
 .task-list-item:hover{
-    background-color: whitesmoke
+    /* border-radius: 15px; */
+    background-color: rgba(221, 236, 253, 0.829)
 }
 .note-input{
     border: none;
@@ -66,5 +73,83 @@ mat-list{
     width: 100%
 }
 .note-input:focus{
+    outline: none
+}
+.sub-task-header{
+    background-color: rgba(207, 226, 252, 0.904);
+    padding-bottom: 1rem
+}
+mat-card-title{
+    margin: 0
+}
+.subtask-card-header{
+    font-weight: 200;
+    color: grey;
+    font-size: 1.1rem;
+}
+.task-due-date{
+    font-size: 0.9rem;
+    color: rgb(233, 23, 23)
+}
+.task-delete-card{
+    transition: all 0.3s ease
+}
+.task-delete-card:hover{
+    background-color: rgb(196, 19, 19);
+}
+.task-delete-card:hover mat-icon{
+    color: white
+}
+.task-delete-card:hover span{
+    color: white
+}
+.task-delete-card:hover span:hover{
+    color: rgb(250, 202, 202)
+}
+.card-text-area{
+    width: 100%;
+    border: none
+}
+.card-text-area:focus{
+    outline: none
+}
+.comment-row{
+    /* background-color: rgba(221, 236, 253, 0.829); */
+    border-bottom: 1px solid whitesmoke
+}
+.comment-row:last-child{
+    border-bottom: none
+}
+.user-image{
+    background-color: rgba(207, 226, 252, 0.904);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1rem
+}
+.text-link{
+    color: rgb(0, 110, 255);
+    cursor: pointer;
+}
+.text-link:hover{
+    color: rgb(53, 136, 252);
+}
+.small-link{
+    cursor: pointer;
+}
+.small-link:hover{
+    color: rgb(53, 136, 252)
+}
+input.comment-editing{
+    /* width: 100%; */
+    color: rgb(53, 136, 252);
+    border: none;
+    border-bottom: 1px solid lightgray
+}
+input.comment-editing:hover{
+    outline: none
+}
+input.comment-editing:active{
     outline: none
 }

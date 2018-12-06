@@ -1,4 +1,4 @@
-<mat-progress-bar mode="indeterminate" *ngIf="showProgressBar" [style.opacity]="showProgressBar == true ? '1': '0'"></mat-progress-bar>
+<mat-progress-bar mode="indeterminate" [style.opacity]="showProgressBar == true ? '1': '0'"></mat-progress-bar>
 <div class="container-fluid">
   <div class="row main-row">
 
@@ -21,62 +21,90 @@
         <mat-drawer #drawer mode="side">
           <div class="vh10"></div>
           <div class="vh10" *ngFor="let list of lists" style="justify-content: flex-start" (click)="makeListActive(list)">
-            <span>{{list.title}}</span>
+            <div style="display: inline-flex;justify-content: space-between;width:100%">
+              <span>{{list.title}}</span>
+              <span>1</span>
+            </div>
           </div>
           <div class="vh10" style="justify-content: flex-start">
             <span class="new-list-link"><input type="text" #title placeholder="New List" (keyup.enter)="createNewList(title.value);title.value=null"></span>
           </div>
         </mat-drawer>
-        <div class="container" *ngIf="activeList">
-          <div class="row mt-4 justify-content-between">
-            <div class="col-6">
+        <div class="container list-header sticky-top" *ngIf="activeList">
+          <div class="row pt-4 justify-content-between">
+            <div class="col-auto">
               <div class="row px-4">
                 <div class="display-4" style="font-size:2rem;font-weight:400">
                   {{activeList.title}}
                 </div>
               </div>
-              <div class="row px-4 align-items-center">
-                <small class="col-auto p-0 pt-2" style="display:flex;justify-content:center">
-                  <mat-icon *ngIf="!activeList.notes && !activeListNotes" style="font-size: 1rem;color: grey">add</mat-icon>
-                  <mat-icon *ngIf="activeList.notes" (click)="activeListNotes=activeList.notes;activeList.notes=null;"
-                    style="font-size: 0.8rem;color: grey">edit</mat-icon>
-                  <mat-icon *ngIf="activeListNotes" (click)="activeList.notes=activeListNotes;activeListNotes=null"
-                    style="font-size: 1rem;color: grey">close</mat-icon>
-                </small>
-                <small class="col pl-0">
-                  <input type="text" *ngIf="!activeList.notes" class="note-input" #note placeholder="{{activeListNotes || 'Add a note'}}"
-                    (keyup.enter)="setListNote(note.value)">
-                  <span>{{activeList.notes}}</span>
-                </small>
-              </div>
             </div>
             <div class="col-auto">
-              <div class="row text-center">
-                <small class="col-12 pb-2">
-                  0 of {{activeList.tasks.length}} tasks completed
-                </small>
-                <div class="col-12">
-                  <mat-progress-bar mode="determinate" value="50"></mat-progress-bar>
+              <div class="row justify-content-end">
+                <div class="col-2">
+                  <div class="row text-center p-0">
+                    <div class="col-12">
+                      <mat-icon>person_add</mat-icon>
+                    </div>
+                    <small class="col-12" style="line-height:0.1rem">Share</small>
+                  </div>
+                </div>
+                <div class="col-2">
+                  <div class="row text-center p-0">
+                    <div class="col-12">
+                      <mat-icon>sort</mat-icon>
+                    </div>
+                    <small class="col-12" style="line-height:0.1rem">Sort</small>
+                  </div>
+                </div>
+                <div class="col-5">
+                  <div class="row text-center">
+                    <small class="col-12 pb-2">
+                      {{activeListCompletedTasks}} of {{activeList.tasks.length}} tasks completed
+                    </small>
+                    <div class="col-12">
+                      <mat-progress-bar mode="determinate" value="{{tasksProgress}}"></mat-progress-bar>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-          <div class="row">
+          <div class="row px-4 align-items-center">
+            <small class="col-auto p-0 pt-2" style="display:flex;justify-content:center">
+              <mat-icon *ngIf="!activeList.notes && !activeListNotes" style="font-size: 1rem;color: grey">add</mat-icon>
+              <mat-icon *ngIf="activeList.notes" (click)="activeListNotes=activeList.notes;activeList.notes=null;"
+                style="font-size: 0.8rem;color: grey">edit</mat-icon>
+              <mat-icon *ngIf="activeListNotes" (click)="activeList.notes=activeListNotes;activeListNotes=null" style="font-size: 1rem;color: grey">close</mat-icon>
+            </small>
+            <small class="col pl-0">
+              <input type="text" *ngIf="!activeList.notes" class="note-input" #note placeholder="{{activeListNotes || 'Add a note'}}"
+                (keyup.enter)="setListNote(note.value)">
+              <span>{{activeList.notes}}</span>
+            </small>
+          </div>
+        </div>
+        <div class="container" *ngIf="activeList">
+          <div class="row" *ngIf="showTasksList">
             <mat-list>
               <mat-list-item class="task-list-item" *ngFor="let task of activeListTasks">
-                <div class="row">
-                  <div class="col-2">
-                    <mat-checkbox style="font-size:2rem" color="primary"></mat-checkbox>
+                <div class="row align-items-start" style="width:100%">
+                  <div class="col-auto">
+                    <mat-checkbox style="font-size:2rem;z-index:99" [(ngModel)]="task.isDone" (change)="setTaskStatus(task)"
+                      color="primary"></mat-checkbox>
                   </div>
-                  <div class="col">
-                    <span class="col-12">{{task.title}}</span>
+                  <div class="col pl-0" (click)="loadTask(task)">
+                    <span class="col-12" [style.text-decoration]="task.isDone?'line-through':'none'">{{task.title}}</span>
                     <small matLine class="col-12" style="line-height:1rem">{{task.createdOn | date }}</small>
                   </div>
                   <div matLine></div>
+                  <div matLine class="lead">
+                    {{task.subTask.length}}
+                  </div>
                 </div>
                 <mat-divider [inset]="true"></mat-divider>
               </mat-list-item>
-              <mat-list-item>
+              <mat-list-item class="sticky-bottom">
                 <div class="row">
                   <div class="col-2" style="display:flex;justify-content:center">
                     <mat-icon>add</mat-icon>
@@ -89,6 +117,228 @@
               </mat-list-item>
             </mat-list>
           </div>
+
+          <!-- sub-task detail view -->
+          <div class="row mt-2" *ngIf="!showTasksList">
+            <div class="col">
+
+              <!-- sub-task header row -->
+              <div class="row sticky-top sub-task-header px-2 align-items-center">
+                <div class="col-auto">
+                  <button mat-icon-button matTooltip="Back" (click)="showTasksList=true">
+                    <mat-icon matRipple>arrow_back</mat-icon>
+                  </button>
+                </div>
+                <div class="col-auto align-self-end mb-1 pl-0">
+                  <mat-checkbox [(ngModel)]="activeTask.isDone" (change)="setTaskStatus(activeTask)" color="primary"></mat-checkbox>
+                </div>
+                <div class="col-auto px-0">
+                  <span class="lead" style="font-weight:bold">{{activeTask.title}}</span>
+                </div>
+                <div class="col-12 pt-1">
+                  <mat-progress-bar mode="determinate" value="{{tasksProgress}}"></mat-progress-bar>
+                </div>
+              </div>
+
+              <div class="row my-3">
+
+                <div class="col-2">
+                  <div class="row">
+                    <div class="col-12">
+                      <mat-card>
+                        <mat-card-content>
+                          <div class="row justify-content-center align-items-center">
+                            <div class="col-auto">
+                              <mat-icon>date_range</mat-icon>
+                            </div>
+                            <div class="col-12 text-center">
+                              <mat-form-field class="d-none" style="width:100%">
+                                <input matInput [matDatepicker]="picker" [(ngModel)]="activeTask.dueDate" (change)="saveTask({dueDate:activeTask.dueDate})"
+                                  placeholder="Set due date">
+                                <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                                <mat-datepicker touchUi #picker></mat-datepicker>
+                              </mat-form-field>
+                              <span class="text-link" *ngIf="activeTask.dueDate==null" (click)="picker.open()">Set due
+                                date</span>
+                              <span *ngIf="activeTask.dueDate!==null" class="task-due-date">Due by
+                                {{activeTask.dueDate | date:'EEEE, MMMM d'}}</span>
+                            </div>
+                          </div>
+                        </mat-card-content>
+                      </mat-card>
+                    </div>
+                    <div class="col-12 py-2">
+                      <mat-card>
+                        <mat-card-content>
+                          <div class="row justify-content-center align-items-center">
+                            <div class="col-auto">
+                              <mat-icon *ngIf="activeTask.reminder==null">alarm_add</mat-icon>
+                              <mat-icon *ngIf="activeTask.reminder!==null">alarm_on</mat-icon>
+                            </div>
+                            <div class="col-12 text-center">
+                              <span class="text-link" *ngIf="activeTask.reminder==null">Set reminder</span>
+                              <span *ngIf="activeTask.reminder!==null" class="task-due-date">Remind at
+                                {{activeTask.reminder}}</span>
+                            </div>
+                          </div>
+                        </mat-card-content>
+                      </mat-card>
+                    </div>
+                    <div class="col-12 py-2">
+                      <mat-card class="task-delete-card">
+                        <mat-card-content>
+                          <div class="row justify-content-center align-items-center">
+                            <div class="col-auto">
+                              <mat-icon *ngIf="activeTask.reminder==null">delete_outline</mat-icon>
+                            </div>
+                            <div class="col-12 text-center">
+                              <span class="text-link" (click)="deleteTask(activeTask.taskId)">Delete task</span>
+                            </div>
+                          </div>
+                        </mat-card-content>
+                      </mat-card>
+                    </div>
+                    <div class="col-12 py-2">
+                      <mat-card>
+                        <mat-card-content>
+                          <div class="row justify-content-center align-items-center">
+                            <div class="col-auto">
+                              <mat-icon>update</mat-icon>
+                            </div>
+                            <div class="col-12 text-center">
+                              <span class="text-muted">Updated on {{activeTask.lastModified | date:'EEEE, MMMM d hh:mm
+                                a'}}</span>
+                            </div>
+                          </div>
+                        </mat-card-content>
+                      </mat-card>
+                    </div>
+                  </div>
+
+                </div>
+
+                <div class="col-5">
+                  <div class="row">
+                    <div class="col-12">
+                      <mat-card>
+                        <mat-card-title>
+                          <div class="row subtask-card-header px-2 justify-content-between">
+                            <div class="col-auto">Sub-tasks</div>
+                            <div class="col-auto">0/{{activeTask.subTask.length}}</div>
+                          </div>
+                        </mat-card-title>
+                        <mat-card-content>
+                          <mat-list>
+                            <mat-list-item class="task-list-item" *ngFor="let task of activeTask.subTask">
+                              <div class="row align-items-center" style="width:100%">
+                                <div class="col-auto">
+                                  <mat-checkbox [(ngModel)]="task.isDone" (change)="setSubTaskStatus(task)" color="primary"></mat-checkbox>
+                                </div>
+                                <div class="col pl-0">
+                                  <span [style.text-decoration]="task.isDone?'line-through':'none'">{{task.title}}</span>
+                                  <!-- <small matLine class="col-12" style="line-height:1rem">{{task.createdOn | date }}</small> -->
+                                </div>
+                              </div>
+                              <mat-divider [inset]="true"></mat-divider>
+                            </mat-list-item>
+                            <mat-list-item>
+                              <div class="row">
+                                <div class="col-2" style="display:flex;justify-content:center">
+                                  <mat-icon>add</mat-icon>
+                                </div>
+                                <div class="col p-0">
+                                  <span class="col-12 pl-0 new-list-link"><input type="text" #subTaskTitle
+                                      (keyup.enter)="createNewSubTask(subTaskTitle.value);subTaskTitle.value=null"
+                                      placeholder="Add a sub-task"></span>
+                                </div>
+                              </div>
+                            </mat-list-item>
+                          </mat-list>
+                        </mat-card-content>
+                      </mat-card>
+                    </div>
+                    <div class="col-12 py-2">
+                      <mat-card>
+                        <mat-card-title class="subtask-card-header">Notes</mat-card-title>
+                        <mat-card-content>
+                          <textarea class="card-text-area" placeholder="Add a note" [(ngModel)]="activeTask.notes"
+                            (change)="saveTask({notes:activeTask.notes})"></textarea>
+                        </mat-card-content>
+                      </mat-card>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col">
+                  <mat-card class="pb-0 px-0">
+                    <mat-card-title>
+                      <div class="container">
+                        <div class="row subtask-card-header justify-content-between">
+                          <div class="col-auto">Comments</div>
+                          <div class="col-auto">{{activeTask.comments.length}}</div>
+                        </div>
+                      </div>
+                    </mat-card-title>
+                    <mat-card-content>
+                      <div class="container pt-2 px-4">
+                        <div class="row py-2 comment-row align-items-center justify-content-between" *ngFor="let comment of activeTask.comments">
+                          <div class="col">
+                            <div class="row align-items-center">
+                              <div mat-card-avatar class="text-center user-image">{{comment.createdBy[0]}}</div>
+                              <div class="col">
+                                <div class="row">
+                                  <span class="col" *ngIf="!comment.editing"><b>{{comment.createdBy}}</b>
+                                    {{comment.body}}</span>
+                                  <input type="text" #commentEdit class="col comment-editing" value="{{comment.body}}"
+                                    *ngIf="comment.editing" (keyup.enter)="editComment(comment._id,commentEdit.value)">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-auto" *ngIf="comment.createdBy == userDetails.userId&&!comment.editing">
+                            <small class="pr-2 small-link" (click)="comment.editing=true">Edit</small>
+                            <small class="small-link" (click)="deleteComment(comment._id)">Delete</small>
+                          </div>
+                          <div class="col-auto" *ngIf="comment.editing">
+                            <!-- <small class="pr-2 small-link" (click)="editComment(comment._id,comment-edit.value)">Save</small> -->
+                            <small class="small-link" (click)="comment.editing=false">Cancel</small>
+                          </div>
+                        </div>
+                        <div class="row justify-content-center align-items-center" [ngClass]="{'py-2':activeTask.comments.length == 0}">
+                          <div class="col-auto text-muted" *ngIf="activeTask.comments.length == 0">
+                            No comments
+                          </div>
+                        </div>
+                      </div>
+                    </mat-card-content>
+                    <mat-card-actions class="mb-0 pb-0">
+                      <div class="container px-4">
+                        <div class="row align-items-center" style="background-color:whitesmoke">
+                          <div class="col">
+                            <mat-form-field style="width:100%">
+                              <textarea matInput placeholder="Add a comment" [(ngModel)]="enteredComment" (keyup.enter)="addComment(enteredComment);enteredComment=null"></textarea>
+                            </mat-form-field>
+                          </div>
+                          <div class="col-auto">
+                            <button mat-icon-button color="primary" (click)="addComment(enteredComment);enteredComment=null">
+                              <mat-icon>send</mat-icon>
+                            </button>
+                            <!-- <button mat-stroked-button (click)="addComment(enteredComment);enteredComment=null">SEND</button> -->
+                          </div>
+                        </div>
+                      </div>
+                    </mat-card-actions>
+                    <mat-card-content>
+
+                    </mat-card-content>
+                  </mat-card>
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+
         </div>
       </mat-drawer-container>
     </div>

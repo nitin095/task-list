@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { Observable } from "rxjs";
 import { Cookie } from 'ng2-cookies/ng2-cookies';
+import { toASCII } from 'punycode';
 
 @Injectable({
   providedIn: 'root'
@@ -93,8 +94,8 @@ export class AppService {
     return response
   }
 
-  editList(listId,data): Observable<any> {
-    let response = this._http.put(`${this.baseUrl}/lists/${listId}/edit`,data)
+  editList(listId, data): Observable<any> {
+    let response = this._http.put(`${this.baseUrl}/lists/${listId}/edit`, data)
     return response
   }
 
@@ -107,6 +108,46 @@ export class AppService {
     let response = this._http.post(`${this.baseUrl}/tasks/create`, taskData)
     return response
   }
-  
+
+  addTaskComment(taskId, comment): Observable<any> {
+    let response = this._http.post(`${this.baseUrl}/tasks/comment/create/${taskId}`, comment)
+    return response
+  }
+
+  deleteTaskComment(taskId, comment): Observable<any> {
+    let response = this._http.post(`${this.baseUrl}/tasks/${taskId}/comment/delete`, comment)
+    return response
+  }
+
+  editTaskComment(taskId, comment): Observable<any> {
+    let response = this._http.put(`${this.baseUrl}/tasks/${taskId}/edit/comment`, comment)
+    return response
+  }
+
+  editTask(taskId, data): Observable<any> {
+    let response = this._http.put(`${this.baseUrl}/tasks/${taskId}/edit`, data)
+    return response
+  }
+
+  deleteTask(taskId): Observable<any> {
+    let response = this._http.post(`${this.baseUrl}/tasks/${taskId}/delete`, '')
+    return response
+  }
+
+  getSingleTask(taskId): Observable<any> {
+    let response = this._http.get(`${this.baseUrl}/tasks/${taskId}/details`)
+    return response
+  }
+
+  createSubTask(taskId, taskData): Observable<any> {
+    let response = this._http.post(`${this.baseUrl}/tasks/subTask/create/${taskId}`, taskData)
+    return response
+  }
+
+  getAllUSers(): Observable<any> {
+    let response = this._http.get(`${this.baseUrl}/users/view/all`)
+    return response
+  }
 
 }
+

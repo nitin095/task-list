@@ -2,15 +2,38 @@
   <mat-toolbar style="background:inherit">
     <span class="logo" [routerLink]="['/home']">TASK LIST</span>
     <span class="nav-spacer"></span>
-    <button class="nav-btn" mat-stroked-button color="primary" *ngIf="url.includes('home')" [routerLink]="['/login']" (click)="reload()">Login</button>
-    <button class="nav-btn" mat-stroked-button color="primary" *ngIf="!url.includes('home') && !url.includes('login')" (click)="logout()">Logout</button>
+    <div class="search">
+      <input type="text" placeholder="Search friends" (keyup.enter)="searchusers()">
+      <div class="search-result-container" *ngIf="showResults">
+        <div class="container">
+          <div class="row" *ngFor="let user of searchResults">
+            <div class="col-1">{{user.firstName[0]}}</div>
+            <div class="col-11">
+              <div class="row">
+                <div class="col-12">{{user.firstName}} {{user.lastName}}</div>
+                <small class="col-auto text-muted">{{user.email}}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button mat-icon-button>
+        <mat-icon>notifications</mat-icon>
+      </button>
+    <button class="nav-btn" mat-stroked-button color="primary" *ngIf="url.includes('home')" [routerLink]="['/login']"
+      (click)="reload()">Login</button>
+    <button mat-icon-button (click)="logout()" *ngIf="!url.includes('home') && !url.includes('login')">
+      <mat-icon>power_settings_new</mat-icon>
+    </button>
+    <!-- <button class="nav-btn" mat-stroked-button color="primary" *ngIf="!url.includes('home') && !url.includes('login')"
+      (click)="logout()">Logout</button> -->
   </mat-toolbar>
-  <!-- <mat-progress-bar mode="indeterminate"></mat-progress-bar> -->
 </nav>
 
 <router-outlet></router-outlet>
 
-<footer>
+<footer *ngIf="url.includes('home')||url.includes('login')">
   <div class="container py-3">
     <div class="row">
       <div class="col">

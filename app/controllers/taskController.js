@@ -238,7 +238,7 @@ let getListTasks = (req, res) => {
 // Get single task details 
 let getSingleTask = (req, res) => {
 
-    let filter = req.query.fields.replace(new RegExp(";", 'g'), " ");
+    let filter = req.query.fields ? req.query.fields.replace(new RegExp(";", 'g'), " ") : '';
     taskModel.findOne({ 'taskId': req.params.taskId })
         .select(`-__v -_id ${filter}`)
         .lean()

@@ -1,12 +1,12 @@
 nav{
-    background: #edeffa;
-    border-bottom: 2px solid #3f51b5;
+    /* background: #f2f3f8; */
+    border-top: 5px solid #197bd8;
     /* background-image: linear-gradient(to right top, #3f51b5, #3849ab, #3040a1, #283898, #20308e); */
     box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12); 
 }
 
 .logo{
-    color: #3f51b5;
+    color: #197bd8;
     font-weight:600;
     letter-spacing: 4px;
     word-spacing: 5px;
@@ -19,11 +19,48 @@ nav{
 
 .nav-btn {
     padding: 0 14px;
-  }
+}
   
-  .nav-spacer {
+.nav-spacer {
     flex: 1 1 auto;
-  }
+}
+mat-icon{
+    color: #197bd8
+}
+button:focus{
+    outline: none
+}
+.search{
+    position: relative;
+    width: 20vw;
+    margin-right: 15px
+}
+
+.search > input{
+   padding-left: 15px;
+    width: 100%;
+    border-radius: 15px;
+    border: 1px solid #197bd8;
+    font-size: 1rem
+}
+
+.search > input::placeholder{
+    color: rgb(168, 168, 168)
+}
+
+.search > input:focus{
+   outline: none
+}
+
+.search-result-container{
+    position: absolute;
+    min-height: 20vh;
+    width: 100%;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    background: #fff;
+    box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
+}
 
 footer{
     background-color: #edeffa;

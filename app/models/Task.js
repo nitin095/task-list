@@ -71,7 +71,15 @@ let taskSchema = new Schema({
     assignees: [],
     subTask: [subTaskSchema],
     comments: [commentSchema],
+    notes: {
+        type: String,
+        default: ""
+    },
     dueDate: {
+        type: Date,
+        default: null
+    },
+    reminder: {
         type: Date,
         default: null
     },

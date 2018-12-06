@@ -13,6 +13,8 @@ export class AppComponent {
   title = 'task-list';
   url: string = "";
   userDetails: any;
+  searchResults: [];
+  showResults: Boolean = false;
 
   constructor(private router: Router, private appService: AppService, public snackBar: MatSnackBar) {
     router.events.subscribe((val) => {
@@ -43,5 +45,16 @@ export class AppComponent {
     });
   } // end logout
 
+  searchusers() {
+    this.appService.getAllUSers().subscribe(
+      response => {
+        this.showResults = true;
+        this.searchResults = response.data
+      },
+      error => {
+        console.log(error)
+      }
+    )
+  }// end searchUsers
 
 }

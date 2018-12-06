@@ -17,8 +17,12 @@ export class DashboardComponent implements OnInit {
   public lists = [];
   public activeList: any;
   public allTasks = [];
+  public showTasksList: Boolean = true;
   public activeListTasks = [];
   public activeListNotes: string;
+  public activeListCompletedTasks: number;
+  public tasksProgress: number;
+  public activeTask: any;
 
   constructor(private _route: ActivatedRoute, private router: Router, private appService: AppService, public snackBar: MatSnackBar) { }
 
@@ -31,6 +35,33 @@ export class DashboardComponent implements OnInit {
     this.getActiveListTasks(list.listId)
   }
 
+  loadTask(task) {
+    console.log(task)
+    this.showTasksList = false;
+    this.activeTask = task;
+  }
+
+  setTaskStatus(task) {
+    let editData = {
+      isDone: task.isDone
+    }
+    task.isDone ? this.activeListCompletedTasks++ : this.activeListCompletedTasks--;
+    this.tasksProgress = (this.activeListCompletedTasks / this.activeListTasks.length) * 100;
+    this.appService.editTask(task.taskId, editData).subscribe(
+      response => {
+        if (response.status === 200) {
+          console.log(response)
+        } else {
+          this.snackBar.open(response.message, 'Close', { duration: 4000 });
+          console.log(response.message)
+        }
+      },
+      error => {
+        console.log("some error occured. Couldn't save list status");
+        console.log(error)
+      }
+    )
+  }// end setTaskStatus
 
   setListNote(note) {
     this.activeListNotes = note;
@@ -105,10 +136,15 @@ export class DashboardComponent implements OnInit {
     this.appService.getListTasks(listId).subscribe(
       response => {
         if (response.status === 200) {
-          this.activeListTasks = response.data
+          this.activeListTasks = response.data;
+          this.showProgressBar = false;
+          this.activeListCompletedTasks = this.activeListTasks.filter(task => task.isDone).length;
+          this.tasksProgress = (this.activeListCompletedTasks / this.activeListTasks.length) * 100;
           console.log(response.data)
         } else {
           this.activeListTasks = null;
+          this.activeListCompletedTasks = 0;
+          this.tasksProgress = 0;
           console.log(response.message)
         }
       },
@@ -121,7 +157,7 @@ export class DashboardComponent implements OnInit {
   }
 
   createNewTask(title) {
-    console.log(`creating new task: ${title}`)
+    this.showProgressBar = true;
     let taskData = {
       listId: this.activeList.listId,
       createdBy: this.userDetails.userId,
@@ -145,5 +181,173 @@ export class DashboardComponent implements OnInit {
       }
     )
   }// end createNewTask
+
+  saveTask(field) {
+    console.log('saving task', field)
+    this.appService.editTask(this.activeTask.taskId, field).subscribe(
+      response => {
+        if (response.status === 200) {
+          console.log(response)
+        } else {
+          this.snackBar.open(response.message, 'Close', { duration: 4000 });
+          console.log(response.message)
+        }
+      },
+      error => {
+        console.log("some error occured. Couldn't save list status");
+        console.log(error)
+      }
+    )
+  }// end saveTask
+
+  deleteTask(taskId) {
+    this.appService.deleteTask(taskId).subscribe(
+      response => {
+        if (response.status === 200) {
+          this.showTasksList = true;
+          this.getActiveListTasks(this.activeList.listId);
+          this.snackBar.open('Task deleted', 'Close', { duration: 4000 });
+          console.log(response)
+        } else {
+          this.snackBar.open(response.message, 'Close', { duration: 4000 });
+          console.log(response.message)
+        }
+      },
+      error => {
+        console.log("some error occured. Couldn't save list status");
+        console.log(error)
+      }
+    )
+  }
+
+  saveSubTask(subTask) {
+    let editData = {
+      dueDate: subTask.dueDate,
+      isDone: subTask.isDone,
+      title: subTask.title,
+    }
+    this.appService.editTask(subTask._id, editData).subscribe(
+      response => {
+        if (response.status === 200) {
+          console.log(response)
+        } else {
+          this.snackBar.open(response.message, 'Close', { duration: 4000 });
+          console.log(response.message)
+        }
+      },
+      error => {
+        console.log("some error occured. Couldn't save list status");
+        console.log(error)
+      }
+    )
+  }
+
+  getSingleTask(taskId) {
+    this.appService.getSingleTask(taskId).subscribe(
+      response => {
+        if (response.status === 200) {
+          this.activeTask = response.data;
+          this.activeListTasks = this.activeListTasks.map((e, i) => e.taskId == this.activeTask.taskId ? e = this.activeTask : e)
+          console.log(response.data)
+        } else {
+          this.snackBar.open(response.message, 'Close', { duration: 4000, });
+          console.log(response.message)
+        }
+      },
+      error => {
+        this.snackBar.open(error.error.message, 'Close', { duration: 4000, });
+        console.log("some error occured");
+        console.log(error)
+      }
+    )
+  }
+
+  addComment(comment) {
+    let commentData = {
+      createdBy: this.userDetails.userId,
+      body: comment
+    }
+    console.log('adding comment', commentData)
+    this.appService.addTaskComment(this.activeTask.taskId, commentData).subscribe(
+      response => {
+        if (response.status == 200) {
+          this.activeTask.comments.push(commentData)
+          console.log(response)
+        } else {
+          console.log(response.message)
+        }
+      },
+      error => {
+        console.log(error)
+      }
+    )
+  }// end addComment
+
+  deleteComment(commentId) {
+    this.appService.deleteTaskComment(this.activeTask.taskId, { comment_id: commentId }).subscribe(
+      response => {
+        if (response.status === 200) {
+          this.snackBar.open('Comment deleted', 'Close', { duration: 4000, });
+          this.getSingleTask(this.activeTask.taskId);
+          console.log(response.data)
+        } else {
+          this.snackBar.open(response.message, 'Close', { duration: 4000, });
+          console.log(response.message)
+        }
+      },
+      error => {
+        this.snackBar.open(error.error.message, 'Close', { duration: 4000, });
+        console.log("some error occured");
+        console.log(error)
+      }
+    )
+  }
+
+  editComment(commentId, body) {
+    let comment = {
+      comment_id: commentId,
+      body: body
+    }
+    this.appService.editTaskComment(this.activeTask.taskId, comment).subscribe(
+      response => {
+        if (response.status === 200) {
+          this.snackBar.open('Comment edited', 'Close', { duration: 4000, });
+          this.getSingleTask(this.activeTask.taskId);
+          console.log(response.data)
+        } else {
+          this.snackBar.open(response.message, 'Close', { duration: 4000, });
+          console.log(response.message)
+        }
+      },
+      error => {
+        this.snackBar.open(error.error.message, 'Close', { duration: 4000, });
+        console.log("some error occured");
+        console.log(error)
+      }
+    )
+  }
+
+  createNewSubTask(title) {
+    let data = {
+      createdBy: this.userDetails.userId,
+      title: title
+    }
+    this.appService.createSubTask(this.activeTask.taskId, data).subscribe(
+      response => {
+        if (response.status === 200) {
+          this.getSingleTask(this.activeTask.taskId)
+          console.log(response.data)
+        } else {
+          this.snackBar.open(response.message, 'Close', { duration: 4000, });
+          console.log(response.message)
+        }
+      },
+      error => {
+        this.snackBar.open(error.error.message, 'Close', { duration: 4000, });
+        console.log("some error occured");
+        console.log(error)
+      }
+    )
+  }
 
 }// end DashboardComponent class
