@@ -7,10 +7,12 @@ import { UserRoutingModule } from './user-routing.module';
 
 import { LoginComponent } from './login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { FriendsComponent } from './friends/friends.component';
+import { ProfileComponent } from './profile/profile.component';
 
 
 @NgModule({
-  declarations: [LoginComponent, DashboardComponent],
+  declarations: [LoginComponent, DashboardComponent, FriendsComponent, ProfileComponent],
   imports: [
     CommonModule,
     FormsModule,

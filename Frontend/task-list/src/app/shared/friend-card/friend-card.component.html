@@ -1,0 +1,28 @@
+<mat-card class="pb-0">
+    <mat-card-content>
+      <div class="row justify-content-center">
+        <div class="col-auto my-4">
+          <span class="circle text-uppercase">{{firstName[0]}}{{lastName[0]}}</span>
+        </div>
+        <div class="col-12 text-center friend-name">
+          {{firstName}} {{lastName}}
+        </div>
+        <div class="col-12 text-center text-small">
+          +{{countryCode}} {{mobileNumber}}
+        </div>
+        <div class="col-12 text-center text-small">
+          {{email}}
+        </div>
+      </div>
+    </mat-card-content>
+    <mat-card-actions class="m-0 p-0">
+      <div class="row text-center">
+        <div class="col btn" *ngIf="cardType == 'friend'">Message</div>
+        <div class="col btn" *ngIf="cardType == 'friend'" (click)="remove_friend()">Remove</div>
+        <div class="col btn" *ngIf="cardType == 'nonFriend'" (click)="add_Friend()">Add</div>
+        <div class="col btn" *ngIf="cardType == 'friendRequest'" (click)="accept_request()">Accept</div>
+        <div class="col btn" *ngIf="cardType == 'friendRequest'" (click)="ignore_request()">Ignore</div>
+        <div class="col btn" *ngIf="cardType == 'friendRequestSent'" (click)="cancel_request()">Cancel</div>
+      </div>
+    </mat-card-actions>
+  </mat-card>

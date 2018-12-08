@@ -1,0 +1,26 @@
+.circle{
+    border-radius: 50%;
+    text-align: center;
+    font-size: 1.5rem;
+    font-weight: 200;
+    padding: 1.2rem 1rem;
+    color: #fff;
+    background-color: rgb(7, 26, 87);
+}
+.friend-name{
+    font-size: 1.2rem;
+}
+.text-small{
+    font-size: small
+}
+.btn{
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    color: rgb(63,81,181);
+    text-transform: uppercase
+}
+.btn:hover{
+    background-color: rgb(63,81,181);
+    color: #fff
+}

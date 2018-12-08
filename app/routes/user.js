@@ -14,7 +14,7 @@ module.exports.setRouter = (app) => {
 
     app.post(`${baseUrl}/google-auth`, googleAuth.auth)
 
-    app.get(`${baseUrl}/view/all`, userController.getAllUser);
+    app.get(`${baseUrl}/view/:users`, userController.getUsers);
 
     /**
 	 * @api {get} /api/v1/users/view/all Get all users
@@ -81,6 +81,245 @@ module.exports.setRouter = (app) => {
 	 * {
 	    "error": true,
 	    "message": "Error Occured.",
+	    "status": 500,
+	    "data": null
+	   }
+	 */
+
+
+	app.get(`${baseUrl}/:userId/friends`, userController.getFriends);
+
+    /**
+	 * @api {get} /api/v1/users/:userId/friends Get all friends of user
+	 * @apiVersion 0.0.1
+	 * @apiGroup read
+	 *
+	 * @apiParam {String} authToken The token for authentication.(Send authToken as query parameter, body parameter or as a header)
+	 * @apiParam {String} userId The userId should be passed as the URL parameter
+	 *
+	 *  @apiSuccessExample {json} Success-Response:
+	 *  {
+	    "error": false,
+	    "message": "User Found Successfully.",
+	    "status": 200,
+	    "data": {
+            userId: "string",
+            firstName: "string",
+            lastName: "string",
+            email: "mstring",
+            countryCode: number,
+            mobileNumber: number,
+            createdOn: "Date",
+				}
+	    }
+	  @apiErrorExample {json} Error-Response:
+	 *
+	 * {
+	    "error": true,
+	    "message": "Error Occured.",
+	    "status": 500,
+	    "data": null
+	   }
+	 */
+
+
+	app.get(`${baseUrl}/friends`, userController.searchFriends);
+
+    /**
+	 * @api {get} /api/v1/users/:userId/friends Get all friends of user
+	 * @apiVersion 0.0.1
+	 * @apiGroup read
+	 *
+	 * @apiParam {String} authToken The token for authentication.(Send authToken as query parameter, body parameter or as a header)
+	 * @apiParam {String} userId The userId should be passed as the URL parameter
+	 *
+	 *  @apiSuccessExample {json} Success-Response:
+	 *  {
+	    "error": false,
+	    "message": "User Found Successfully.",
+	    "status": 200,
+	    "data": {
+            userId: "string",
+            firstName: "string",
+            lastName: "string",
+            email: "mstring",
+            countryCode: number,
+            mobileNumber: number,
+            createdOn: "Date",
+				}
+	    }
+	  @apiErrorExample {json} Error-Response:
+	 *
+	 * {
+	    "error": true,
+	    "message": "Error Occured.",
+	    "status": 500,
+	    "data": null
+	   }
+	 */
+
+	app.post(`${baseUrl}/:userId/friends/add`, userController.addFriend);
+
+    /**
+	 * @api {post} /api/v1/users/:userId/friends/add Add friend in user's friend list
+	 * @apiVersion 0.0.1
+	 * @apiGroup create
+	 *
+     * @apiParam {String} firstName First name of the user passed as the body parameter
+     * @apiParam {String} lastName LastName of the user passed as the body parameter
+     * @apiParam {Number} countryCode Country code of the user passed as the body parameter
+     * @apiParam {Number} mobileNumber Mobile number of the user passed as the body parameter
+     * @apiParam {String} email Email of the user passed as the body parameter
+     * @apiParam {String} password Password of the user passed as the body parameter
+	 *
+	 *  @apiSuccessExample {json} Success-Response:
+	 *  {
+	    "error": false,
+	    "message": "User Created Successfully",
+	    "status": 200,
+	    "data": []
+	    	}
+		}
+	}
+	  @apiErrorExample {json} Error-Response:
+	 *
+	 * {
+	    "error": true,
+	    "message": "Error Occured.,
+	    "status": 500,
+	    "data": null
+	   }
+	 */
+
+	app.put(`${baseUrl}/:userId/friends/remove`, userController.removeFriend);
+
+    /**
+	 * @api {put} /api/v1/users/:userId/friends/add Add friend in user's friend list
+	 * @apiVersion 0.0.1
+	 * @apiGroup create
+	 *
+     * @apiParam {String} firstName First name of the user passed as the body parameter
+     * @apiParam {String} lastName LastName of the user passed as the body parameter
+     * @apiParam {Number} countryCode Country code of the user passed as the body parameter
+     * @apiParam {Number} mobileNumber Mobile number of the user passed as the body parameter
+     * @apiParam {String} email Email of the user passed as the body parameter
+     * @apiParam {String} password Password of the user passed as the body parameter
+	 *
+	 *  @apiSuccessExample {json} Success-Response:
+	 *  {
+	    "error": false,
+	    "message": "User Created Successfully",
+	    "status": 200,
+	    "data": []
+	    	}
+		}
+	}
+	  @apiErrorExample {json} Error-Response:
+	 *
+	 * {
+	    "error": true,
+	    "message": "Error Occured.,
+	    "status": 500,
+	    "data": null
+	   }
+	 */
+
+	app.put(`${baseUrl}/:userId/friends/accept`, userController.acceptFriendRequest);
+
+    /**
+	 * @api {post} /api/v1/users/:userId/friends/add Add friend in user's friend list
+	 * @apiVersion 0.0.1
+	 * @apiGroup create
+	 *
+     * @apiParam {String} firstName First name of the user passed as the body parameter
+     * @apiParam {String} lastName LastName of the user passed as the body parameter
+     * @apiParam {Number} countryCode Country code of the user passed as the body parameter
+     * @apiParam {Number} mobileNumber Mobile number of the user passed as the body parameter
+     * @apiParam {String} email Email of the user passed as the body parameter
+     * @apiParam {String} password Password of the user passed as the body parameter
+	 *
+	 *  @apiSuccessExample {json} Success-Response:
+	 *  {
+	    "error": false,
+	    "message": "User Created Successfully",
+	    "status": 200,
+	    "data": []
+	    	}
+		}
+	}
+	  @apiErrorExample {json} Error-Response:
+	 *
+	 * {
+	    "error": true,
+	    "message": "Error Occured.,
+	    "status": 500,
+	    "data": null
+	   }
+	 */
+
+
+	app.put(`${baseUrl}/:userId/friends/cancel`, userController.cancelSentRequest);
+
+    /**
+	 * @api {post} /api/v1/users/:userId/friends/add Add friend in user's friend list
+	 * @apiVersion 0.0.1
+	 * @apiGroup create
+	 *
+     * @apiParam {String} firstName First name of the user passed as the body parameter
+     * @apiParam {String} lastName LastName of the user passed as the body parameter
+     * @apiParam {Number} countryCode Country code of the user passed as the body parameter
+     * @apiParam {Number} mobileNumber Mobile number of the user passed as the body parameter
+     * @apiParam {String} email Email of the user passed as the body parameter
+     * @apiParam {String} password Password of the user passed as the body parameter
+	 *
+	 *  @apiSuccessExample {json} Success-Response:
+	 *  {
+	    "error": false,
+	    "message": "User Created Successfully",
+	    "status": 200,
+	    "data": []
+	    	}
+		}
+	}
+	  @apiErrorExample {json} Error-Response:
+	 *
+	 * {
+	    "error": true,
+	    "message": "Error Occured.,
+	    "status": 500,
+	    "data": null
+	   }
+	 */
+
+
+	app.put(`${baseUrl}/:userId/friends/ignore`, userController.ignoreReceivedRequest);
+
+    /**
+	 * @api {post} /api/v1/users/:userId/friends/ignore Add friend in user's friend list
+	 * @apiVersion 0.0.1
+	 * @apiGroup create
+	 *
+     * @apiParam {String} firstName First name of the user passed as the body parameter
+     * @apiParam {String} lastName LastName of the user passed as the body parameter
+     * @apiParam {Number} countryCode Country code of the user passed as the body parameter
+     * @apiParam {Number} mobileNumber Mobile number of the user passed as the body parameter
+     * @apiParam {String} email Email of the user passed as the body parameter
+     * @apiParam {String} password Password of the user passed as the body parameter
+	 *
+	 *  @apiSuccessExample {json} Success-Response:
+	 *  {
+	    "error": false,
+	    "message": "User Created Successfully",
+	    "status": 200,
+	    "data": []
+	    	}
+		}
+	}
+	  @apiErrorExample {json} Error-Response:
+	 *
+	 * {
+	    "error": true,
+	    "message": "Error Occured.,
 	    "status": 500,
 	    "data": null
 	   }

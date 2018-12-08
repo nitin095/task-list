@@ -45,8 +45,8 @@ export class AppComponent {
     });
   } // end logout
 
-  searchusers() {
-    this.appService.getAllUSers().subscribe(
+  searchTasks() {
+    this.appService.getAllTasks().subscribe(
       response => {
         this.showResults = true;
         this.searchResults = response.data

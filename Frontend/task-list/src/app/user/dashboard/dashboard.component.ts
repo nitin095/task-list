@@ -27,7 +27,24 @@ export class DashboardComponent implements OnInit {
   constructor(private _route: ActivatedRoute, private router: Router, private appService: AppService, public snackBar: MatSnackBar) { }
 
   ngOnInit() {
-    this.getAllLists()
+    this.getAllLists(true);
+    this._route.queryParams.subscribe(params => {
+      if (params['taskId']) {
+        this.showProgressBar = true;
+        setTimeout(() => {
+          this.getSingleTask(params['taskId'])
+          setTimeout(() => {
+            let list = this.lists.map(i => i.listId == this.activeTask.listId ? i : '');
+            list = list.filter(x=>x)
+            console.log(list[0])
+            this.makeListActive(list[0])
+            this.showTasksList = false;
+            this.showProgressBar = false
+          }, 2000)
+        }, 2000)
+      }else{
+      }
+    });
   }
 
   makeListActive(list) {
@@ -85,13 +102,14 @@ export class DashboardComponent implements OnInit {
     )
   }// end setListNote
 
-  getAllLists() {
+  getAllLists(onInit?) {
     this.appService.getAllLists(this.userDetails.userId).subscribe(
       response => {
         this.showProgressBar = false;
         if (response.status === 200) {
           this.lists = response.data;
           console.log(response.data)
+          if(onInit) this.makeListActive(this.lists[0])
         } else {
           this.snackBar.open(response.message, 'Close', { duration: 4000, });
           console.log(response.message)

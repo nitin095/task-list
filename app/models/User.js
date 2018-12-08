@@ -44,6 +44,8 @@ let userSchema = new Schema({
     get: v => `${root}${v}`
   },
   friends: [],
+  friendRequests: [],
+  friendRequestsSent: [],
   resetPasswordToken: {
     type: String,
     default: null,

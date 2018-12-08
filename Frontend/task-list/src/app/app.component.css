@@ -1,5 +1,5 @@
 nav{
-    /* background: #f2f3f8; */
+    background: #fff;
     border-top: 5px solid #197bd8;
     /* background-image: linear-gradient(to right top, #3f51b5, #3849ab, #3040a1, #283898, #20308e); */
     box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12); 
@@ -56,10 +56,21 @@ button:focus{
     position: absolute;
     min-height: 20vh;
     width: 100%;
+    font-size: 1rem;
     border-bottom-left-radius: 15px;
     border-bottom-right-radius: 15px;
     background: #fff;
     box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12);
+}
+
+.search-result-container .row:hover{
+    background-color: whitesmoke
+}
+
+.search-result-container small{
+    line-height: 0.2rem;
+    padding-bottom: 0.8rem;
+    color: rgb(233, 23, 23)
 }
 
 footer{

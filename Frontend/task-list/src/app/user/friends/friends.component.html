@@ -1,0 +1,74 @@
+<div class="container pt-5">
+
+  <!-- friends -->
+  <div class="row pb-2">
+    <div class="col-auto display-4 heading">Friends</div>
+  </div>
+  <mat-divider></mat-divider>
+
+  <div class="row my-3" *ngIf="showNoFriends">
+    <div class="col-auto text-muted">You have no friends.</div>
+  </div>
+
+  <div class="row my-3" *ngIf="friends">
+    <div class="col-3" *ngFor="let friend of friends">
+      <friend-card [firstName]='friend.firstName' [lastName]="friend.lastName" [email]="friend.email" [countryCode]="friend.countryCode"
+        [mobileNumber]="friend.mobileNumber" [cardType]="'friend'" (removeFriend)="removeFriend(friend.userId)"></friend-card>
+    </div>
+  </div>
+
+
+  <!-- friend requests -->
+  <div class="row mt-5 pb-2">
+    <div class="col-auto display-4 heading">Friend requests</div>
+  </div>
+  <mat-divider></mat-divider>
+
+  <div class="row my-3" *ngIf="friendRequests">
+    <div class="col-3" *ngFor="let friend of friendRequests">
+      <friend-card [firstName]='friend.firstName' [lastName]="friend.lastName" [email]="friend.email" [countryCode]="friend.countryCode"
+        [mobileNumber]="friend.mobileNumber" [cardType]="'friendRequest'" (friendRequest)="handleFriendRequest($event,friend.userId)"></friend-card>
+    </div>
+  </div>
+
+
+    <!-- friend requests sent-->
+    <div class="row mt-5 pb-2">
+        <div class="col-auto display-4 heading">Friend requests sent</div>
+      </div>
+      <mat-divider></mat-divider>
+    
+      <div class="row my-3" *ngIf="friendRequestsSent">
+        <div class="col-3" *ngFor="let friend of friendRequestsSent">
+          <friend-card [firstName]='friend.firstName' [lastName]="friend.lastName" [email]="friend.email" [countryCode]="friend.countryCode"
+            [mobileNumber]="friend.mobileNumber" [cardType]="'friendRequestSent'" (friendRequest)="handleFriendRequest($event,friend.userId)"></friend-card>
+        </div>
+      </div>
+
+
+  <!-- find friends -->
+  <div class="row mt-5 pb-2">
+    <div class="col-auto display-4 heading">Find friends</div>
+  </div>
+  <mat-divider></mat-divider>
+
+  <div class="row my-3 pt-3 align-items-center">
+    <div class="col-6">
+      <input type="text" placeholder="Search by name, email or phone number" maxlength="40" #search (keyup.enter)="searchFriends(search.value)">
+    </div>
+    <div class="col-auto p-0" style="display:inline-flex;justify-content: flex-start;align-self: center;right: 5%">
+      <mat-icon matRipple matRippleUnbounded="true" matRippleCentered="true" matRippleRadius="40" matRippleColor="rgba(25, 123, 216, 0.5)"
+        class="search-icon" (click)="searchFriends(search.value)">search</mat-icon>
+    </div>
+  </div>
+
+  <div class="row my-3" *ngIf="searchResults">
+    <div class="col-3" *ngFor="let friend of searchResults">
+      <friend-card [firstName]='friend.firstName' [lastName]="friend.lastName" [email]="friend.email" [countryCode]="friend.countryCode"
+        [mobileNumber]="friend.mobileNumber" [cardType]="'nonFriend'" (addFriend)="addFriend(friend.userId)"></friend-card>
+    </div>
+  </div>
+
+  
+</div>
+<!-- end container -->

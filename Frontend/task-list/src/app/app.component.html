@@ -3,24 +3,25 @@
     <span class="logo" [routerLink]="['/home']">TASK LIST</span>
     <span class="nav-spacer"></span>
     <div class="search">
-      <input type="text" placeholder="Search friends" (keyup.enter)="searchusers()">
+      <input type="text" placeholder="Search tasks" (keyup.enter)="searchTasks()">
       <div class="search-result-container" *ngIf="showResults">
         <div class="container">
-          <div class="row" *ngFor="let user of searchResults">
-            <div class="col-1">{{user.firstName[0]}}</div>
-            <div class="col-11">
-              <div class="row">
-                <div class="col-12">{{user.firstName}} {{user.lastName}}</div>
-                <small class="col-auto text-muted">{{user.email}}</small>
-              </div>
-            </div>
+          <div class="row" *ngFor="let task of searchResults" [routerLink]="['/dashboard']" [queryParams]="{taskId: task.taskId}" (click)="showResults=false">
+            <div class="col-12">{{task.title}}</div>
+            <small class="col-auto" *ngIf="task.dueDate">Due on {{task.dueDate | date}}</small>
           </div>
         </div>
       </div>
     </div>
-    <button mat-icon-button>
-        <mat-icon>notifications</mat-icon>
-      </button>
+    <button mat-icon-button matTooltip="Dashboard" *ngIf="url.includes('friends')" [routerLink]="['/dashboard']">
+      <mat-icon>dashboard</mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Friends" *ngIf="url.includes('dashboard')" [routerLink]="['/friends']">
+      <mat-icon>group</mat-icon>
+    </button>
+    <button mat-icon-button matTooltip="Notifications">
+      <mat-icon>notifications</mat-icon>
+    </button>
     <button class="nav-btn" mat-stroked-button color="primary" *ngIf="url.includes('home')" [routerLink]="['/login']"
       (click)="reload()">Login</button>
     <button mat-icon-button (click)="logout()" *ngIf="!url.includes('home') && !url.includes('login')">

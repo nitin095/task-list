@@ -15,10 +15,10 @@ const mailer = require('../libs/mailer')
 const UserModel = mongoose.model('User')
 
 
-// Get all user Details 
-let getAllUser = (req, res) => {
+// Get multiple user Details 
+let getUsers = (req, res) => {
 
-    UserModel.find()
+    UserModel.find({ userId: req.params.users.split(',') })
         .select(' -__v -_id')
         .lean()
         .exec((err, result) => {
@@ -28,7 +28,7 @@ let getAllUser = (req, res) => {
                 let apiResponse = response.generate(true, 'Failed To Find User Details', 500, null)
                 res.send(apiResponse)
             } else if (check.isEmpty(result)) {
-                logger.info('No User Found', 'User Controller: getAllUser')
+                logger.info('No User Found', 'User Controller: getUsers')
                 let apiResponse = response.generate(true, 'No User Found', 404, null)
                 res.send(apiResponse)
             } else {
@@ -420,6 +420,504 @@ let logout = (req, res) => {
 } // end logout function.
 
 
+let getFriends = (req, res) => {
+
+    UserModel.findOne({ userId: req.params.userId }, (err, user) => {
+        if (err) {
+            console.log(err)
+            logger.error('Failed To find user', 'userController: getFriends()', 10)
+            let apiResponse = response.generate(true, 'Failed To Find User Details', 500, null)
+            res.send(apiResponse)
+        } else if (check.isEmpty(user)) {
+            logger.error('No User Found', 'userController: getFriends()', 7)
+            let apiResponse = response.generate(true, 'No User Found', 404, null)
+            res.send(apiResponse)
+        } else {
+            let friends = user.friends;
+            if (check.isEmpty(friends)) {
+                let apiResponse = response.generate(true, 'No friend Found', 404, null)
+                res.send(apiResponse)
+            } else {
+                UserModel.find({ userId: friends })
+                    .select(' -__v -_id -password -createdOn -lastModified')
+                    .lean()
+                    .exec((err, friends) => {
+                        if (err) {
+                            console.log(err)
+                            logger.error('Failed To find friends', 'userController: getFriends()', 10)
+                            let apiResponse = response.generate(true, 'Failed To Find User Friends', 500, null)
+                            res.send(apiResponse)
+                        } else {
+                            let apiResponse = response.generate(false, 'User Friends found', 200, friends)
+                            res.send(apiResponse)
+                        }
+                    })
+            }
+        }
+    })
+}// end getFriends
+
+
+let addFriend = (req, res) => {
+
+    let saveRequest = () => {
+        return new Promise((resolve, reject) => {
+            if (req.body.friendId) {
+                UserModel.findOneAndUpdate({ userId: req.params.userId },
+                    { $push: { 'friendRequestsSent': req.body.friendId } }, (err, result) => {
+                        if (err) {
+                            console.log(err)
+                            logger.error(err.message, 'User Controller: addFriend', 10)
+                            let apiResponse = response.generate(true, 'Failed To save friend request', 500, null)
+                            reject(apiResponse)
+                        } else if (check.isEmpty(result)) {
+                            logger.info('No User Found', 'User Controller: addFriend')
+                            let apiResponse = response.generate(true, 'No User Found', 404, null)
+                            reject(apiResponse)
+                        } else {
+                            logger.info('Friend request saved', 'userController: addFriend()', 10)
+                            resolve()
+                        }
+                    })
+            } else {
+                let apiResponse = response.generate(true, '"friendId" parameter is missing', 400, null)
+                reject(apiResponse)
+            }
+        })// end Promise
+    }// end saveRequest
+
+    let sendFriendRequest = () => {
+        return new Promise((resolve, reject) => {
+            UserModel.findOneAndUpdate({ userId: req.body.friendId },
+                { $push: { 'friendRequests': req.params.userId } }, (err, result) => {
+                    if (err) {
+                        console.log(err)
+                        logger.error(err.message, 'User Controller: addFriend', 10)
+                        let apiResponse = response.generate(true, 'Failed To send friend request', 500, null)
+                        reject(apiResponse)
+                    } else if (check.isEmpty(result)) {
+                        logger.info('No User Found', 'User Controller: addFriend')
+                        let apiResponse = response.generate(true, 'No User Found', 404, null)
+                        reject(apiResponse)
+                    } else {
+                        logger.info('Friend request sent', 'userController: addFriend()', 10)
+                        resolve()
+                    }
+                })
+        })// end Promise
+    }// end sendFriendRequest
+
+    let getUpdatedUserDetails = () => {
+        return new Promise((resolve, reject) => {
+            UserModel.findOne({ userId: req.params.userId }, (err, userDetails) => {
+                if (err) {
+                    console.log(err)
+                    logger.error(err.message, 'User Controller: addFriend', 10)
+                    let apiResponse = response.generate(true, 'Failed To get user details', 500, null)
+                    reject(apiResponse)
+                } else {
+                    resolve(userDetails)
+                }
+            })
+        })// end Promise
+    }// end getUpdatedUserDetails
+
+    saveRequest()
+        .then(sendFriendRequest)
+        .then(getUpdatedUserDetails)
+        .then((userDetails) => {
+            let apiResponse = response.generate(false, 'Friend request sent', 200, userDetails)
+            res.status(200)
+            res.send(apiResponse)
+        })
+        .catch((err) => {
+            console.log("errorhandler");
+            console.log(err);
+            res.status(err.status)
+            res.send(err)
+        })
+
+}// end addFriend
+
+
+let acceptFriendRequest = (req, res) => {
+
+    let updateFriendList = () => {
+        return new Promise((resolve, reject) => {
+            if (req.body.friendId) {
+                UserModel.findOneAndUpdate({ userId: req.params.userId },
+                    {
+                        $push: { 'friends': req.body.friendId },
+                        $pull: { 'friendRequests': req.body.friendId }
+                    }, (err, result) => {
+                        if (err) {
+                            console.log(err)
+                            logger.error(err.message, 'User Controller: acceptFriendRequest', 10)
+                            let apiResponse = response.generate(true, 'Failed add to friend list', 500, null)
+                            reject(apiResponse)
+                        } else if (check.isEmpty(result)) {
+                            logger.info('No User Found', 'User Controller: acceptFriendRequest')
+                            let apiResponse = response.generate(true, 'No User Found', 404, null)
+                            reject(apiResponse)
+                        } else {
+                            logger.info('Friend request saved', 'userController: acceptFriendRequest()', 10)
+                            resolve()
+                        }
+                    })
+            } else {
+                let apiResponse = response.generate(true, '"friendId" parameter is missing', 400, null)
+                reject(apiResponse)
+            }
+        })// end Promise
+    }// end updateFriendList
+
+    let updateSenderFriendList = () => {
+        return new Promise((resolve, reject) => {
+            UserModel.findOneAndUpdate({ userId: req.body.friendId },
+                {
+                    $push: { 'friends': req.params.userId },
+                    $pull: { 'friendRequestsSent': req.params.userId }
+                }, (err, result) => {
+                    if (err) {
+                        console.log(err)
+                        logger.error(err.message, 'User Controller: acceptFriendRequest', 10)
+                        let apiResponse = response.generate(true, 'Failed to update senders friends list', 500, null)
+                        reject(apiResponse)
+                    } else if (check.isEmpty(result)) {
+                        logger.info('No User Found', 'User Controller: acceptFriendRequest')
+                        let apiResponse = response.generate(true, 'No User Found', 404, null)
+                        reject(apiResponse)
+                    } else {
+                        logger.info('Sender friends list updated', 'userController: acceptFriendRequest()', 10)
+                        resolve()
+                    }
+                })
+        })// end Promise
+    }// end updateSenderFriendList
+
+    let getUpdatedUserDetails = () => {
+        return new Promise((resolve, reject) => {
+            UserModel.findOne({ userId: req.params.userId }, (err, userDetails) => {
+                if (err) {
+                    console.log(err)
+                    logger.error(err.message, 'User Controller: addFriend', 10)
+                    let apiResponse = response.generate(true, 'Failed To get user details', 500, null)
+                    reject(apiResponse)
+                } else {
+                    resolve(userDetails)
+                }
+            })
+        })// end Promise
+    }// end getUpdatedUserDetails
+
+    updateFriendList()
+        .then(updateSenderFriendList)
+        .thrn(getUpdatedUserDetails)
+        .then((userDetails) => {
+            let apiResponse = response.generate(false, 'Friend request accepted', 200, userDetails)
+            res.status(200)
+            res.send(apiResponse)
+        })
+        .catch((err) => {
+            console.log("errorhandler");
+            console.log(err);
+            res.status(err.status)
+            res.send(err)
+        })
+
+}// end acceptFriendRequest
+
+
+let cancelSentRequest = (req, res) => {
+
+    let removeSentRequest = () => {
+        return new Promise((resolve, reject) => {
+            if (req.body.friendId) {
+                UserModel.findOneAndUpdate({ userId: req.params.userId },
+                    { $pull: { 'friendRequestsSent': req.body.friendId } }, (err, result) => {
+                        if (err) {
+                            console.log(err)
+                            logger.error(err.message, 'User Controller: cancelSentRequest', 10)
+                            let apiResponse = response.generate(true, 'Failed to cancel sent friend request', 500, null)
+                            reject(apiResponse)
+                        } else if (check.isEmpty(result)) {
+                            logger.info('No friend reqest Found', 'User Controller: cancelSentRequest')
+                            let apiResponse = response.generate(true, 'No friend request Found', 404, null)
+                            reject(apiResponse)
+                        } else {
+                            logger.info('Sent friend request removed', 'userController: cancelSentRequest()', 10)
+                            resolve()
+                        }
+                    })
+            } else {
+                let apiResponse = response.generate(true, '"friendId" parameter is missing', 400, null)
+                reject(apiResponse)
+            }
+        })// end Promise
+    }// end removeSentRequest
+
+
+    let removeReceivedRequest = () => {
+
+        return new Promise((resolve, reject) => {
+            UserModel.findOneAndUpdate({ userId: req.body.friendId },
+                { $pull: { 'friendRequests': req.params.userId } }, (err, result) => {
+                    if (err) {
+                        console.log(err)
+                        logger.error(err.message, 'User Controller: cancelSentRequest', 10)
+                        let apiResponse = response.generate(true, 'Failed to remove request', 500, null)
+                        reject(apiResponse)
+                    } else if (check.isEmpty(result)) {
+                        logger.info('No User Found', 'User Controller: cancelSentRequest')
+                        let apiResponse = response.generate(true, 'No User Found', 404, null)
+                        reject(apiResponse)
+                    } else {
+                        logger.info('receiver received request removed', 'userController: cancelSentRequest()', 10)
+                        resolve()
+                    }
+                })
+        })// end Promise
+    }// end removeReceivedRequest
+
+    let getUpdatedUserDetails = () => {
+        return new Promise((resolve, reject) => {
+            UserModel.findOne({ userId: req.params.userId }, (err, userDetails) => {
+                if (err) {
+                    console.log(err)
+                    logger.error(err.message, 'User Controller: addFriend', 10)
+                    let apiResponse = response.generate(true, 'Failed To get user details', 500, null)
+                    reject(apiResponse)
+                } else {
+                    resolve(userDetails)
+                }
+            })
+        })// end Promise
+    }// end getUpdatedUserDetails
+
+    removeSentRequest()
+        .then(removeReceivedRequest)
+        .thrn(getUpdatedUserDetails)
+        .then((userDetails) => {
+            let apiResponse = response.generate(false, 'Friend request cancelled', 200, userDetails)
+            res.status(200)
+            res.send(apiResponse)
+        })
+        .catch((err) => {
+            console.log("error handler");
+            console.log(err);
+            res.status(err.status)
+            res.send(err)
+        })
+
+}
+
+
+let ignoreReceivedRequest = (req, res) => {
+
+    let removeRequestFromReceiverSide = () => {
+        return new Promise((resolve, reject) => {
+            if (req.body.friendId) {
+                UserModel.findOneAndUpdate({ userId: req.params.userId },
+                    { $pull: { 'friendRequests': req.body.friendId } }, (err, result) => {
+                        if (err) {
+                            console.log(err)
+                            logger.error(err.message, 'User Controller: ignoreReceivedRequest', 10)
+                            let apiResponse = response.generate(true, 'Failed to remove received request', 500, null)
+                            reject(apiResponse)
+                        } else if (check.isEmpty(result)) {
+                            logger.info('No friend reqest Found', 'User Controller: ignoreReceivedRequest')
+                            let apiResponse = response.generate(true, 'No friend request Found', 404, null)
+                            reject(apiResponse)
+                        } else {
+                            logger.info('Received friend request removed', 'userController: ignoreReceivedRequest()', 10)
+                            resolve()
+                        }
+                    })
+            } else {
+                let apiResponse = response.generate(true, '"friendId" parameter is missing', 400, null)
+                reject(apiResponse)
+            }
+        })// end Promise
+    }// end removeSentRequest
+
+
+    let removeRequestFromSenderSide = () => {
+
+        return new Promise((resolve, reject) => {
+            UserModel.findOneAndUpdate({ userId: req.body.friendId },
+                { $pull: { 'friendRequestsSent': req.params.userId } }, (err, result) => {
+                    if (err) {
+                        console.log(err)
+                        logger.error(err.message, 'User Controller: ignoreReceivedRequest', 10)
+                        let apiResponse = response.generate(true, 'Failed to remove request', 500, null)
+                        reject(apiResponse)
+                    } else if (check.isEmpty(result)) {
+                        logger.info('No User Found', 'User Controller: ignoreReceivedRequest')
+                        let apiResponse = response.generate(true, 'No User Found', 404, null)
+                        reject(apiResponse)
+                    } else {
+                        logger.info('sender sent request removed', 'userController: ignoreReceivedRequest()', 10)
+                        resolve()
+                    }
+                })
+        })// end Promise
+    }// end removeReceivedRequest
+
+    let getUpdatedUserDetails = () => {
+        return new Promise((resolve, reject) => {
+            UserModel.findOne({ userId: req.params.userId }, (err, userDetails) => {
+                if (err) {
+                    console.log(err)
+                    logger.error(err.message, 'User Controller: addFriend', 10)
+                    let apiResponse = response.generate(true, 'Failed To get user details', 500, null)
+                    reject(apiResponse)
+                } else {
+                    resolve(userDetails)
+                }
+            })
+        })// end Promise
+    }// end getUpdatedUserDetails
+
+    removeRequestFromReceiverSide()
+        .then(removeRequestFromSenderSide)
+        .then(getUpdatedUserDetails)
+        .then((userDetails) => {
+            let apiResponse = response.generate(false, 'Friend request ignored', 200, userDetails)
+            res.status(200)
+            res.send(apiResponse)
+        })
+        .catch((err) => {
+            console.log("error handler");
+            console.log(err);
+            res.status(err.status)
+            res.send(err)
+        })
+
+}
+
+let removeFriend = (req, res) => {
+
+    let removeFromUserSide = () => {
+        return new Promise((resolve, reject) => {
+            if (req.body.friendId) {
+                UserModel.findOneAndUpdate({ userId: req.params.userId },
+                    { $pull: { 'friends': req.body.friendId } }, (err, result) => {
+                        if (err) {
+                            console.log(err)
+                            logger.error(err.message, 'User Controller: removeFriend', 10)
+                            let apiResponse = response.generate(true, 'Faile to remove friend', 500, null)
+                            reject(apiResponse)
+                        } else if (check.isEmpty(result)) {
+                            logger.info('No User Found', 'User Controller: removeFriend')
+                            let apiResponse = response.generate(true, 'No User Found', 404, null)
+                            reject(apiResponse)
+                        } else {
+                            logger.info('Friend removed', 'userController: removeFriend()', 10)
+                            resolve()
+                        }
+                    })
+            } else {
+                let apiResponse = response.generate(true, '"friendId" parameter is missing', 400, null)
+                reject(apiResponse)
+            }
+        })// end Promise
+    }// end removeFromUserSide
+
+    let removeFromFriendSide = () => {
+        return new Promise((resolve, reject) => {
+            UserModel.findOneAndUpdate({ userId: req.body.friendId },
+                { $pull: { 'friends': req.params.userId } }, (err, result) => {
+                    if (err) {
+                        console.log(err)
+                        logger.error(err.message, 'User Controller: removeFriend', 10)
+                        let apiResponse = response.generate(true, 'Failed to update senders friends list', 500, null)
+                        reject(apiResponse)
+                    } else if (check.isEmpty(result)) {
+                        logger.info('No User Found', 'User Controller: removeFriend')
+                        let apiResponse = response.generate(true, 'No User Found', 404, null)
+                        reject(apiResponse)
+                    } else {
+                        logger.info("User removed from friend's list", 'userController: removeFriend()', 10)
+                        resolve()
+                    }
+                })
+        })// end Promise
+    }// end removeFromFriendSide
+
+    let getUpdatedUserDetails = () => {
+        return new Promise((resolve, reject) => {
+            UserModel.findOne({ userId: req.params.userId }, (err, userDetails) => {
+                if (err) {
+                    console.log(err)
+                    logger.error(err.message, 'User Controller: addFriend', 10)
+                    let apiResponse = response.generate(true, 'Failed To get user details', 500, null)
+                    reject(apiResponse)
+                } else {
+                    resolve(userDetails)
+                }
+            })
+        })// end Promise
+    }// end getUpdatedUserDetails
+
+    removeFromUserSide()
+        .then(removeFromFriendSide)
+        .then(getUpdatedUserDetails)
+        .then((userDetails) => {
+            let apiResponse = response.generate(false, 'Friend removed', 200, userDetails)
+            res.status(200)
+            res.send(apiResponse)
+        })
+        .catch((err) => {
+            console.log("errorhandler");
+            console.log(err);
+            res.status(err.status)
+            res.send(err)
+        })
+
+}// end removeFriend
+
+
+let searchFriends = (req, res) => {
+    let search = req.query.search;
+    let keywords = search.split(" ");
+    let strings = keywords.map(x => {
+        if (!isNaN(x)) return ""
+        else return new RegExp(x, 'i')
+    })
+    let numbers = keywords.map(x => {
+        if (!isNaN(x)) return x
+        else return null
+    })
+    console.log(keywords)
+
+    UserModel.find({
+        $or: [
+            { firstName: { $in: strings } },
+            { lastName: { $in: strings } },
+            { email: { $in: strings } },
+            { mobileNumber: { $in: numbers } }
+        ]
+    })
+        .select(' -__v -_id -password -createdOn -lastModified')
+        .lean()
+        .exec((err, result) => {
+            if (err) {
+                console.log(err)
+                logger.error(err.message, 'User Controller: searchFriends', 10)
+                let apiResponse = response.generate(true, 'Failed To search friends', 500, null)
+                res.send(apiResponse)
+            } else if (check.isEmpty(result)) {
+                logger.info('No user Found', 'User Controller: searchFriends')
+                let apiResponse = response.generate(true, 'No results', 404, null)
+                res.send(apiResponse)
+            } else {
+                let apiResponse = response.generate(false, 'users found', 200, result)
+                res.send(apiResponse)
+            }
+        })
+}// end searchFriends
+
+
 // getAllAuths function
 let getAllAuths = (req, res) => {
 
@@ -435,7 +933,7 @@ let getAllAuths = (req, res) => {
 module.exports = {
 
     signUpFunction: signUpFunction,
-    getAllUser: getAllUser,
+    getUsers: getUsers,
     editUser: editUser,
     deleteUser: deleteUser,
     getSingleUser: getSingleUser,
@@ -443,6 +941,13 @@ module.exports = {
     logout: logout,
     forgotPassword: forgotPassword,
     resetPassword: resetPassword,
+    addFriend: addFriend,
+    removeFriend: removeFriend,
+    getFriends: getFriends,
+    acceptFriendRequest: acceptFriendRequest,
+    cancelSentRequest: cancelSentRequest,
+    ignoreReceivedRequest: ignoreReceivedRequest,
+    searchFriends: searchFriends,
     getAllAuths: getAllAuths
 
 }// end exports

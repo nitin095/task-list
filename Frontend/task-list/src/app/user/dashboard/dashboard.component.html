@@ -18,7 +18,7 @@
 
     <div class="col p-0">
       <mat-drawer-container autosize>
-        <mat-drawer #drawer mode="side">
+        <mat-drawer #drawer mode="side" opened="true">
           <div class="vh10"></div>
           <div class="vh10" *ngFor="let list of lists" style="justify-content: flex-start" (click)="makeListActive(list)">
             <div style="display: inline-flex;justify-content: space-between;width:100%">

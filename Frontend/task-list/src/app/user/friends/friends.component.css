@@ -1,0 +1,39 @@
+.text-small{
+    font-size: small
+}
+.text-bold{
+    font-weight: bold
+}
+.heading{
+    color: rgb(63,81,181);
+    font-weight: 600;
+    font-size:1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 2px
+}
+input{
+    width: 100%;
+    padding: 0.3rem 1rem;
+    padding-right: 2.5rem;
+    font-size: 1.8rem;
+    letter-spacing: 1px;
+    font-weight: 500;
+    border: none;
+    border-bottom: 1px solid grey
+}
+input:focus{
+    outline: none
+}
+.search-icon:hover{
+    cursor: pointer;
+    color: rgb(63,81,181);
+}
+.search-icon::selection{
+    background: none
+}
+input::placeholder{
+    font-size: 1rem;
+    font-weight: normal;
+    letter-spacing: normal;
+    color: rgb(172, 170, 170)
+}

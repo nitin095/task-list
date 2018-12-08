@@ -144,8 +144,48 @@ export class AppService {
     return response
   }
 
-  getAllUSers(): Observable<any> {
-    let response = this._http.get(`${this.baseUrl}/users/view/all`)
+  getAllTasks(): Observable<any> {
+    let response = this._http.get(`${this.baseUrl}/tasks/all`)
+    return response
+  }
+
+  getAllFriends(userId): Observable<any> {
+    let response = this._http.get(`${this.baseUrl}/users/${userId}/friends`)
+    return response
+  }
+
+  getMultipleUsers(userIds): Observable<any> {
+    let response = this._http.get(`${this.baseUrl}/users/view/${userIds}`)
+    return response
+  }
+
+  searchFriends(search): Observable<any> {
+    let response = this._http.get(`${this.baseUrl}/users/friends/?search=${search}`)
+    return response
+  }
+
+  addFriend(userId, friend): Observable<any> {
+    let response = this._http.post(`${this.baseUrl}/users/${userId}/friends/add`, friend)
+    return response
+  }
+
+  removeFriend(userId, friend): Observable<any> {
+    let response = this._http.put(`${this.baseUrl}/users/${userId}/friends/remove`, friend)
+    return response
+  }
+
+  acceptFriendRequest(userId, friend): Observable<any> {
+    let response = this._http.put(`${this.baseUrl}/users/${userId}/friends/accept`, friend)
+    return response
+  }
+
+  cancelSentRequest(userId, friend): Observable<any> {
+    let response = this._http.put(`${this.baseUrl}/users/${userId}/friends/cancel`, friend)
+    return response
+  }
+
+  ignoreReceivedRequest(userId, friend): Observable<any> {
+    let response = this._http.put(`${this.baseUrl}/users/${userId}/friends/ignore`, friend)
     return response
   }
 
