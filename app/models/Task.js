@@ -86,6 +86,10 @@ let taskSchema = new Schema({
     isDone: {
         type: Boolean,
         default: false
+    },
+    isImportant: {
+        type: Boolean,
+        default: false
     }
 },
     {

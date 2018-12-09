@@ -1,5 +1,5 @@
-<mat-progress-bar mode="indeterminate" [style.opacity]="showProgressBar == true ? '1': '0'"></mat-progress-bar>
 <div class="container-fluid">
+    <mat-progress-bar mode="indeterminate" [style.opacity]="showProgressBar == true ? '1': '0'"></mat-progress-bar>
   <div class="row main-row">
 
     <div class="side-nav-col">
@@ -8,18 +8,33 @@
           <mat-icon>menu</mat-icon>
         </button>
       </div>
+      <div class="vh10" (click)="activeList=null;loadCalender()">
+        <mat-icon>wb_sunny</mat-icon>
+      </div>
+      <div class="vh10" (click)="activeList=null;loadCalender()">
+        <mat-icon>date_range</mat-icon>
+      </div>
       <div class="vh10 side-nav-icon" *ngFor="let list of lists">
         <mat-icon>list</mat-icon>
       </div>
       <div class="vh10">
         <mat-icon>add</mat-icon>
       </div>
+
     </div>
 
     <div class="col p-0">
       <mat-drawer-container autosize>
-        <mat-drawer #drawer mode="side" opened="true">
+
+        <!-- drawer -->
+        <mat-drawer #drawer [mode]="mobileQuery.matches ? 'over' : 'side'" opened="true">
           <div class="vh10"></div>
+          <div class="vh10" style="justify-content: flex-start">
+            <span>Today</span>
+          </div>
+          <div class="vh10" style="justify-content: flex-start" (click)="activeList=null;loadCalender()">
+            <span>Calendar</span>
+          </div>
           <div class="vh10" *ngFor="let list of lists" style="justify-content: flex-start" (click)="makeListActive(list)">
             <div style="display: inline-flex;justify-content: space-between;width:100%">
               <span>{{list.title}}</span>
@@ -29,19 +44,24 @@
           <div class="vh10" style="justify-content: flex-start">
             <span class="new-list-link"><input type="text" #title placeholder="New List" (keyup.enter)="createNewList(title.value);title.value=null"></span>
           </div>
+
         </mat-drawer>
+        <!-- end drawer -->
+
+
+        <!-- list view header -->
         <div class="container list-header sticky-top" *ngIf="activeList">
           <div class="row pt-4 justify-content-between">
-            <div class="col-auto">
+            <div class="col-12 col-sm-auto">
               <div class="row px-4">
                 <div class="display-4" style="font-size:2rem;font-weight:400">
                   {{activeList.title}}
                 </div>
               </div>
             </div>
-            <div class="col-auto">
+            <div class="col-12 col-lg-auto py-3 py-sm-0">
               <div class="row justify-content-end">
-                <div class="col-2">
+                <div class="col-3 col-sm-2">
                   <div class="row text-center p-0">
                     <div class="col-12">
                       <mat-icon>person_add</mat-icon>
@@ -49,7 +69,7 @@
                     <small class="col-12" style="line-height:0.1rem">Share</small>
                   </div>
                 </div>
-                <div class="col-2">
+                <div class="col-3 col-sm-2">
                   <div class="row text-center p-0">
                     <div class="col-12">
                       <mat-icon>sort</mat-icon>
@@ -57,7 +77,7 @@
                     <small class="col-12" style="line-height:0.1rem">Sort</small>
                   </div>
                 </div>
-                <div class="col-5">
+                <div class="col-6 col-sm-5">
                   <div class="row text-center">
                     <small class="col-12 pb-2">
                       {{activeListCompletedTasks}} of {{activeList.tasks.length}} tasks completed
@@ -70,6 +90,7 @@
               </div>
             </div>
           </div>
+
           <div class="row px-4 align-items-center">
             <small class="col-auto p-0 pt-2" style="display:flex;justify-content:center">
               <mat-icon *ngIf="!activeList.notes && !activeListNotes" style="font-size: 1rem;color: grey">add</mat-icon>
@@ -83,47 +104,54 @@
               <span>{{activeList.notes}}</span>
             </small>
           </div>
+
         </div>
+        <!-- end list view header -->
+
+
+        <!-- tasks list view -->
         <div class="container" *ngIf="activeList">
+
           <div class="row" *ngIf="showTasksList">
-            <mat-list>
-              <mat-list-item class="task-list-item" *ngFor="let task of activeListTasks">
-                <div class="row align-items-start" style="width:100%">
-                  <div class="col-auto">
-                    <mat-checkbox style="font-size:2rem;z-index:99" [(ngModel)]="task.isDone" (change)="setTaskStatus(task)"
-                      color="primary"></mat-checkbox>
-                  </div>
-                  <div class="col pl-0" (click)="loadTask(task)">
-                    <span class="col-12" [style.text-decoration]="task.isDone?'line-through':'none'">{{task.title}}</span>
-                    <small matLine class="col-12" style="line-height:1rem">{{task.createdOn | date }}</small>
-                  </div>
-                  <div matLine></div>
-                  <div matLine class="lead">
-                    {{task.subTask.length}}
-                  </div>
+
+            <div class="col-12">
+              <div class="row align-items-center task-list-item" *ngFor="let task of activeListTasks">
+                <div class="col-1 pt-1 text-center">
+                  <mat-checkbox style="font-size:2rem;z-index:99" [(ngModel)]="task.isDone" (change)="setTaskStatus(task)"
+                    color="primary"></mat-checkbox>
                 </div>
-                <mat-divider [inset]="true"></mat-divider>
-              </mat-list-item>
-              <mat-list-item class="sticky-bottom">
-                <div class="row">
-                  <div class="col-2" style="display:flex;justify-content:center">
+                <div class="col-9 col-sm text-left" (click)="loadTask(task)" style="cursor:pointer">
+                  <span class="lead" [style.text-decoration]="task.isDone?'line-through':'none'">{{task.title}}</span>
+                </div>
+                <div class="col-2 d-none d-sm-flex">
+                  <small>{{task.subTask.length}} Subtasks</small>
+                </div>
+                <div class="col-2 due-date d-none d-sm-flex">
+                  <small>Due by {{task.dueDate | date}}</small>
+                </div>
+                <div class="col-1">
+                  <mat-icon>bookmark_border</mat-icon>
+                </div>
+              </div>
+              <div class="row pt-2">
+                  <div class="col-1 pt-1" style="display:flex;justify-content:center">
                     <mat-icon>add</mat-icon>
                   </div>
-                  <div class="col p-0">
-                    <span class="col-12 new-list-link"><input type="text" #taskTitle (keyup.enter)="createNewTask(taskTitle.value);taskTitle.value=null"
+                  <div class="col">
+                    <span class="lead new-list-link"><input type="text" #taskTitle (keyup.enter)="createNewTask(taskTitle.value);taskTitle.value=null"
                         placeholder="Add a task"></span>
                   </div>
                 </div>
-              </mat-list-item>
-            </mat-list>
+            </div>
+
           </div>
 
           <!-- sub-task detail view -->
-          <div class="row mt-2" *ngIf="!showTasksList">
-            <div class="col">
+          <div class="row mt-2 sticky-top" *ngIf="!showTasksList">
+            <div class="col" style="background-color:white">
 
               <!-- sub-task header row -->
-              <div class="row sticky-top sub-task-header px-2 align-items-center">
+              <div class="row sticky-top sub-task-header pt-2 px-2 align-items-center">
                 <div class="col-auto">
                   <button mat-icon-button matTooltip="Back" (click)="showTasksList=true">
                     <mat-icon matRipple>arrow_back</mat-icon>
@@ -135,16 +163,19 @@
                 <div class="col-auto px-0">
                   <span class="lead" style="font-weight:bold">{{activeTask.title}}</span>
                 </div>
-                <div class="col-12 pt-1">
+                <div class="col-12 pt-2">
                   <mat-progress-bar mode="determinate" value="{{tasksProgress}}"></mat-progress-bar>
                 </div>
+                <small class="col-12 py-1 text-muted">
+                  Created on {{activeTask.createdOn | date}} / Updated on {{activeTask.lastModified | date}}
+                </small>
               </div>
 
               <div class="row my-3">
 
-                <div class="col-2">
+                <div class="col-12 col-md-2">
                   <div class="row">
-                    <div class="col-12">
+                    <div class="col-12 col-sm-4 col-md-12 pb-2">
                       <mat-card>
                         <mat-card-content>
                           <div class="row justify-content-center align-items-center">
@@ -167,7 +198,7 @@
                         </mat-card-content>
                       </mat-card>
                     </div>
-                    <div class="col-12 py-2">
+                    <div class="col-12 col-sm-4 col-md-12 pb-2">
                       <mat-card>
                         <mat-card-content>
                           <div class="row justify-content-center align-items-center">
@@ -184,7 +215,7 @@
                         </mat-card-content>
                       </mat-card>
                     </div>
-                    <div class="col-12 py-2">
+                    <div class="col-12 col-sm-4 col-md-12 pb-2">
                       <mat-card class="task-delete-card">
                         <mat-card-content>
                           <div class="row justify-content-center align-items-center">
@@ -198,26 +229,11 @@
                         </mat-card-content>
                       </mat-card>
                     </div>
-                    <div class="col-12 py-2">
-                      <mat-card>
-                        <mat-card-content>
-                          <div class="row justify-content-center align-items-center">
-                            <div class="col-auto">
-                              <mat-icon>update</mat-icon>
-                            </div>
-                            <div class="col-12 text-center">
-                              <span class="text-muted">Updated on {{activeTask.lastModified | date:'EEEE, MMMM d hh:mm
-                                a'}}</span>
-                            </div>
-                          </div>
-                        </mat-card-content>
-                      </mat-card>
-                    </div>
                   </div>
 
                 </div>
 
-                <div class="col-5">
+                <div class="col-12 col-md-5">
                   <div class="row">
                     <div class="col-12">
                       <mat-card>
@@ -232,11 +248,13 @@
                             <mat-list-item class="task-list-item" *ngFor="let task of activeTask.subTask">
                               <div class="row align-items-center" style="width:100%">
                                 <div class="col-auto">
-                                  <mat-checkbox [(ngModel)]="task.isDone" (change)="setSubTaskStatus(task)" color="primary"></mat-checkbox>
+                                  <mat-checkbox [(ngModel)]="task.isDone" (change)="saveSubTask(task._id,task.isDone)" color="primary"></mat-checkbox>
                                 </div>
                                 <div class="col pl-0">
                                   <span [style.text-decoration]="task.isDone?'line-through':'none'">{{task.title}}</span>
-                                  <!-- <small matLine class="col-12" style="line-height:1rem">{{task.createdOn | date }}</small> -->
+                                </div>
+                                <div class="col-auto">
+                                  <mat-icon style="color:lightgrey" (click)="deleteSubTask(task._id)">close</mat-icon>
                                 </div>
                               </div>
                               <mat-divider [inset]="true"></mat-divider>
@@ -269,7 +287,7 @@
                   </div>
                 </div>
 
-                <div class="col">
+                <div class="col-12 col-md">
                   <mat-card class="pb-0 px-0">
                     <mat-card-title>
                       <div class="container">
@@ -340,6 +358,23 @@
           </div>
 
         </div>
+        <!-- end tasks list view -->
+
+
+        <!-- calender view -->
+        <div class="container">
+          <div class="row">
+            <div class="col-12 calender-col">
+              <div *ngIf="calendarOptions">
+                <ng-fullcalendar #ucCalendar [options]="calendarOptions" (eventClick)="eventClick($event.detail)"
+                  (eventResize)="updateMeeting($event.detail.event)" (dayClick)="dayClick($event.detail)" (select)="select($event.detail)"
+                  (eventDrop)="updateMeeting($event.detail.event)"></ng-fullcalendar>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- end calender view -->
+
       </mat-drawer-container>
     </div>
 

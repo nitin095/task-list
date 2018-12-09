@@ -1,9 +1,12 @@
-mat-drawer-container{
+.container-fluid{
     height:90vh;
+    overflow: hidden;
+}
+mat-drawer-container{
+  height: 100%;
 }
 .main-row{
-    /* outline: 2px solid red;  */
-    /* height: 90vh */
+    height: 100%
 }
 .side-nav-col{
     background: whitesmoke;
@@ -17,8 +20,6 @@ outline: none
     display: flex;
     justify-content: center;
     align-items: center;
-    /* background: lightblue; */
-    /* outline: 1px solid red; */
 }
 .flex-center{
     display: flex;
@@ -48,7 +49,8 @@ mat-drawer span{
     outline: none
 }
 .new-list-link input::placeholder{
-    color: rgb(0, 110, 255)
+    color: rgb(0, 110, 255);
+    font-weight: 300
 }
 .new-list-link input:focus::placeholder{
     color: grey
@@ -67,6 +69,9 @@ mat-list{
     /* border-radius: 15px; */
     background-color: rgba(221, 236, 253, 0.829)
 }
+.task-list-item .due-date{
+    color: rgb(240, 26, 26)
+}
 .note-input{
     border: none;
     background: none;
@@ -76,8 +81,8 @@ mat-list{
     outline: none
 }
 .sub-task-header{
-    background-color: rgba(207, 226, 252, 0.904);
-    padding-bottom: 1rem
+    background-color: rgb(207, 226, 252);
+    /* padding-bottom: 1rem */
 }
 mat-card-title{
     margin: 0
@@ -152,4 +157,20 @@ input.comment-editing:hover{
 }
 input.comment-editing:active{
     outline: none
+}
+.sticky{
+    position: sticky
+}
+
+/* Media queries */
+
+/*extra small devices*/
+@media screen and (max-width: 299px) {
+    .side-nav-col{
+        display: none
+    }
+}
+/*small devices*/
+@media screen and (min-width: 576px) and (max-width: 767px) {
+    
 }

@@ -38,23 +38,78 @@ export class FriendsComponent implements OnInit {
   }
 
   getAllFriends() {
-    this.appService.getAllFriends(this.userDetails.userId).subscribe(
-      response => {
-        if (response.status === 200) {
-          console.log(response)
-          this.friends = response.data;
-          this.showNoFriends = false
-        } else {
-          this.friends = null;
-          this.showNoFriends = true;
+
+    this.userDetails = this.appService.getUserInfoFromLocalstorage()
+
+    if (this.userDetails.friends.length !== 0) {
+      this.appService.getMultipleUsers(this.userDetails.friends).subscribe(
+        response => {
+          if (response.status === 200) {
+            this.friends = response.data;
+            this.showNoFriends = false
+          } else {
+            console.log(response.message)
+          }
+        },
+        error => {
+          console.log("some error occured. Cannot get freinds");
+          console.log(error)
         }
-      },
-      error => {
-        console.log("some error occured. Cannot get freinds");
-        console.log(error)
-      }
-    )
+      )
+    } else {
+      this.friends = null;
+      this.showNoFriends = true;
+    }
+
   }// end getAllFriends
+
+  getFriendRequests() {
+
+    this.userDetails = this.appService.getUserInfoFromLocalstorage()
+
+    if (this.userDetails.friendRequests.length !== 0) {
+      this.appService.getMultipleUsers(this.userDetails.friendRequests).subscribe(
+        response => {
+          if (response.status === 200) {
+            this.friendRequests = response.data;
+          } else {
+            console.log(response.message)
+          }
+        },
+        error => {
+          console.log("some error occured. Cannot get freinds");
+          console.log(error)
+        }
+      )
+    } else {
+      this.friendRequests = null
+    }
+
+  }// end getFriendRequests
+
+  getFriendRequestsSent() {
+
+    this.userDetails = this.appService.getUserInfoFromLocalstorage()
+
+    if (this.userDetails.friendRequestsSent.length !== 0) {
+      this.appService.getMultipleUsers(this.userDetails.friendRequestsSent).subscribe(
+        response => {
+          if (response.status === 200) {
+            this.friendRequestsSent = response.data;
+          } else {
+            console.log(response.message)
+          }
+        },
+        error => {
+          console.log("some error occured. Cannot get freinds");
+          console.log(error)
+        }
+      )
+    } else {
+      this.friendRequestsSent = null
+    }
+
+  }// end getFriendRequests
 
   searchFriends(search) {
     this.launchRipple()
@@ -77,11 +132,10 @@ export class FriendsComponent implements OnInit {
   }// end searchFriends
 
   addFriend(friendId) {
-    console.log('adding friend', friendId)
     this.appService.addFriend(this.userDetails.userId, { friendId: friendId }).subscribe(
       response => {
         if (response.status === 200) {
-          this.userDetails.friendRequestsSent.push(friendId);
+          this.appService.setUserInfoInLocalStorage(response.data)
           this.getFriendRequestsSent()
           this.snackBar.open(response.message, 'Close', { duration: 4000 });
         } else {
@@ -95,45 +149,11 @@ export class FriendsComponent implements OnInit {
     )
   }// end addFriend
 
-  getFriendRequests() {
-    this.appService.getMultipleUsers(this.userDetails.friendRequests).subscribe(
-      response => {
-        if (response.status === 200) {
-          this.friendRequests = response.data;
-          console.log('friend requests found', this.friendRequests)
-        } else {
-          console.log(response.message)
-        }
-      },
-      error => {
-        console.log("some error occured. Cannot get freinds");
-        console.log(error)
-      }
-    )
-  }// end getFriendRequests
-
-
-  getFriendRequestsSent() {
-    this.appService.getMultipleUsers(this.userDetails.friendRequestsSent).subscribe(
-      response => {
-        if (response.status === 200) {
-          this.friendRequestsSent = response.data;
-          console.log('sent friend requests found', this.friendRequests)
-        } else {
-          console.log(response.message)
-        }
-      },
-      error => {
-        console.log("some error occured. Cannot get freinds");
-        console.log(error)
-      }
-    )
-  }// end getFriendRequests
-
   removeFriend(friendId) {
     this.appService.removeFriend(this.userDetails.userId, { friendId: friendId }).subscribe(
       response => {
         if (response.status === 200) {
+          this.appService.setUserInfoInLocalStorage(response.data)
           this.getAllFriends();
         } else {
           console.log(response.message)
@@ -151,8 +171,8 @@ export class FriendsComponent implements OnInit {
       this.appService.acceptFriendRequest(this.userDetails.userId, { friendId: friendId }).subscribe(
         response => {
           if (response.status === 200) {
-            this.friendRequests = this.friendRequests.filter(x => x.userId !== friendId)
-            this.userDetails.friendRequests.splice(this.userDetails.friendRequests.indexOf(friendId), 1)
+            this.appService.setUserInfoInLocalStorage(response.data);
+            this.getFriendRequests();
             this.getAllFriends();
           } else {
             console.log(response.message)
@@ -167,9 +187,8 @@ export class FriendsComponent implements OnInit {
       this.appService.ignoreReceivedRequest(this.userDetails.userId, { friendId: friendId }).subscribe(
         response => {
           if (response.status === 200) {
-            this.userDetails.friendRequests.splice(this.userDetails.friendRequests.indexOf(friendId), 1);
-            this.friendRequests = this.friendRequests.filter(x => x.userId !== friendId);
-            this.getAllFriends();
+            this.appService.setUserInfoInLocalStorage(response.data)
+            this.getFriendRequests()
           } else {
             console.log(response.message)
           }
@@ -183,8 +202,8 @@ export class FriendsComponent implements OnInit {
       this.appService.cancelSentRequest(this.userDetails.userId, { friendId: friendId }).subscribe(
         response => {
           if (response.status === 200) {
-            this.userDetails.friendRequestsSent.splice(this.userDetails.friendRequestsSent.indexOf(friendId), 1)
-            this.friendRequestsSent = this.friendRequestsSent.filter(x => x.userId !== friendId)
+            this.appService.setUserInfoInLocalStorage(response.data);
+            this.getFriendRequestsSent();
           } else {
             console.log(response.message)
           }

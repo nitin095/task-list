@@ -12,7 +12,7 @@ import { MatSnackBar } from '@angular/material';
 export class AppComponent {
   title = 'task-list';
   url: string = "";
-  userDetails: any;
+  userDetails = this.appService.getUserInfoFromLocalstorage();
   searchResults: [];
   showResults: Boolean = false;
 
@@ -45,8 +45,13 @@ export class AppComponent {
     });
   } // end logout
 
+  getInitials() {
+    let initials = `${this.userDetails.firstName[0]}${this.userDetails.lastName[0]}`
+    return initials
+  }
+
   searchTasks() {
-    this.appService.getAllTasks().subscribe(
+    this.appService.getAllTasks(this.userDetails.userId).subscribe(
       response => {
         this.showResults = true;
         this.searchResults = response.data

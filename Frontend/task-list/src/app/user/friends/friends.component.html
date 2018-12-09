@@ -11,7 +11,7 @@
   </div>
 
   <div class="row my-3" *ngIf="friends">
-    <div class="col-3" *ngFor="let friend of friends">
+    <div class="col-6 col-md-3" *ngFor="let friend of friends">
       <friend-card [firstName]='friend.firstName' [lastName]="friend.lastName" [email]="friend.email" [countryCode]="friend.countryCode"
         [mobileNumber]="friend.mobileNumber" [cardType]="'friend'" (removeFriend)="removeFriend(friend.userId)"></friend-card>
     </div>
@@ -25,7 +25,7 @@
   <mat-divider></mat-divider>
 
   <div class="row my-3" *ngIf="friendRequests">
-    <div class="col-3" *ngFor="let friend of friendRequests">
+    <div class="col-6 col-md-4 col-lg-3" *ngFor="let friend of friendRequests">
       <friend-card [firstName]='friend.firstName' [lastName]="friend.lastName" [email]="friend.email" [countryCode]="friend.countryCode"
         [mobileNumber]="friend.mobileNumber" [cardType]="'friendRequest'" (friendRequest)="handleFriendRequest($event,friend.userId)"></friend-card>
     </div>
@@ -53,7 +53,7 @@
   <mat-divider></mat-divider>
 
   <div class="row my-3 pt-3 align-items-center">
-    <div class="col-6">
+    <div class="col-10 col-md-6">
       <input type="text" placeholder="Search by name, email or phone number" maxlength="40" #search (keyup.enter)="searchFriends(search.value)">
     </div>
     <div class="col-auto p-0" style="display:inline-flex;justify-content: flex-start;align-self: center;right: 5%">

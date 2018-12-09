@@ -1,10 +1,11 @@
 nav{
+    height: 10vh;
+}
+mat-toolbar{
+    border-top: 4px solid #197bd8;
     background: #fff;
-    border-top: 5px solid #197bd8;
-    /* background-image: linear-gradient(to right top, #3f51b5, #3849ab, #3040a1, #283898, #20308e); */
     box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12); 
 }
-
 .logo{
     color: #197bd8;
     font-weight:600;
@@ -12,17 +13,28 @@ nav{
     word-spacing: 5px;
     cursor: pointer;
 }
-
 .logo:focus{
     outline: none
 }
-
 .nav-btn {
     padding: 0 14px;
-}
-  
+} 
 .nav-spacer {
     flex: 1 1 auto;
+}
+.circle{
+    border-radius: 50%;
+    background: #197bd8;
+    color: #fff;
+    font-weight: 500;
+    letter-spacing: 1px;
+    font-size: small;
+    cursor: pointer;
+    padding: 0.1rem 0.5rem 
+}
+.circle:hover{
+    box-shadow: 0 2px 1px -1px rgba(0,0,0,.2), 0 1px 1px 0 rgba(0,0,0,.14), 0 1px 3px 0 rgba(0,0,0,.12); 
+    
 }
 mat-icon{
     color: #197bd8

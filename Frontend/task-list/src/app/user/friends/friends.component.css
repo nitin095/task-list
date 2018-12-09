@@ -9,7 +9,7 @@
     font-weight: 600;
     font-size:1.2rem;
     text-transform: uppercase;
-    letter-spacing: 2px
+    letter-spacing: 2px;
 }
 input{
     width: 100%;
@@ -36,4 +36,20 @@ input::placeholder{
     font-weight: normal;
     letter-spacing: normal;
     color: rgb(172, 170, 170)
+}
+
+
+/* Media queries */
+
+/* extra small devices */
+@media screen and (max-width: 420px) {
+    input{
+        font-size: 1rem
+    }
+    input::placeholder{
+        font-size: 0.8rem;
+    }
+    .heading{
+        font-size:1rem;
+    }
 }

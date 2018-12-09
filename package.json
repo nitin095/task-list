@@ -26,6 +26,7 @@
     "nodemailer": "^4.7.0",
     "pino": "^5.8.1",
     "request": "^2.88.0",
-    "shortid": "^2.2.14"
+    "shortid": "^2.2.14",
+    "socket.io": "^2.2.0"
   }
 }

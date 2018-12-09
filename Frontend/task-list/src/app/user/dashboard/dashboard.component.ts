@@ -1,18 +1,29 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { MediaMatcher } from '@angular/cdk/layout';
 import { ActivatedRoute, Router } from "@angular/router";
 import { AppService } from './../../app.service'
 import { Observable } from 'rxjs';
 import { MatSnackBar } from '@angular/material';
+import { SocketService } from './../../socket.service';
 import { Cookie } from 'ng2-cookies/ng2-cookies';
+
+//importing ng-fullCalender 
+import { CalendarComponent } from 'ng-fullcalendar';
+import { Options } from 'fullcalendar';
+
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  styleUrls: ['./dashboard.component.css'],
+  providers: [Location, SocketService]
 })
-export class DashboardComponent implements OnInit {
 
+export class DashboardComponent implements OnInit, OnDestroy {
+
+  mobileQuery: MediaQueryList;
   showProgressBar = true;
+  public authToken: any;
   public userDetails = this.appService.getUserInfoFromLocalstorage();
   public lists = [];
   public activeList: any;
@@ -23,11 +34,27 @@ export class DashboardComponent implements OnInit {
   public activeListCompletedTasks: number;
   public tasksProgress: number;
   public activeTask: any;
+  public notification: any;
 
-  constructor(private _route: ActivatedRoute, private router: Router, private appService: AppService, public snackBar: MatSnackBar) { }
+  private _mobileQueryListener: () => void;
+
+  calendarOptions: Options;
+  @ViewChild(CalendarComponent) ucCalendar: CalendarComponent;
+
+  constructor(private _route: ActivatedRoute, private router: Router, private appService: AppService, public snackBar: MatSnackBar, public SocketService: SocketService, changeDetectorRef: ChangeDetectorRef, media: MediaMatcher) {
+    this.mobileQuery = media.matchMedia('(max-width: 600px)');
+    this._mobileQueryListener = () => changeDetectorRef.detectChanges();
+    this.mobileQuery.addListener(this._mobileQueryListener);
+  }
 
   ngOnInit() {
+
     this.getAllLists(true);
+    this.getAllTasks();
+    this.authToken = Cookie.get('authtoken');
+    this.verifyUserConfirmation();
+    this.getNotifications();
+
     this._route.queryParams.subscribe(params => {
       if (params['taskId']) {
         this.showProgressBar = true;
@@ -35,21 +62,27 @@ export class DashboardComponent implements OnInit {
           this.getSingleTask(params['taskId'])
           setTimeout(() => {
             let list = this.lists.map(i => i.listId == this.activeTask.listId ? i : '');
-            list = list.filter(x=>x)
+            list = list.filter(x => x)
             console.log(list[0])
             this.makeListActive(list[0])
             this.showTasksList = false;
             this.showProgressBar = false
           }, 2000)
         }, 2000)
-      }else{
+      } else {
       }
     });
+
+  }// end ngOnInit 
+
+  ngOnDestroy(): void {
+    this.mobileQuery.removeListener(this._mobileQueryListener);
   }
 
   makeListActive(list) {
     this.activeList = list;
-    this.getActiveListTasks(list.listId)
+    this.getActiveListTasks(list.listId);
+    this.calendarOptions = null
   }
 
   loadTask(task) {
@@ -109,7 +142,7 @@ export class DashboardComponent implements OnInit {
         if (response.status === 200) {
           this.lists = response.data;
           console.log(response.data)
-          if(onInit) this.makeListActive(this.lists[0])
+          if (onInit) this.makeListActive(this.lists[0])
         } else {
           this.snackBar.open(response.message, 'Close', { duration: 4000, });
           console.log(response.message)
@@ -123,6 +156,26 @@ export class DashboardComponent implements OnInit {
       }
     )
   }// end getAllLists
+
+  getAllTasks() {
+    this.showProgressBar = true;
+    this.appService.getAllTasks(this.userDetails.userId).subscribe(
+      response => {
+        this.showProgressBar = false;
+        if (response.status === 200) {
+          this.allTasks = response.data;
+        } else {
+          console.log(response.message)
+        }
+      },
+      error => {
+        this.snackBar.open(error.error.message, 'Close', { duration: 4000, });
+        this.showProgressBar = false;
+        console.log("some error occured");
+        console.log(error)
+      }
+    )
+  }// end getAllTasks
 
   createNewList(title) {
 
@@ -238,13 +291,9 @@ export class DashboardComponent implements OnInit {
     )
   }
 
-  saveSubTask(subTask) {
-    let editData = {
-      dueDate: subTask.dueDate,
-      isDone: subTask.isDone,
-      title: subTask.title,
-    }
-    this.appService.editTask(subTask._id, editData).subscribe(
+  saveSubTask(id, status) {
+    console.log('saving', this.activeTask.taskId, id, status)
+    this.appService.setSubTaskStatus(this.activeTask.taskId, id, status).subscribe(
       response => {
         if (response.status === 200) {
           console.log(response)
@@ -254,7 +303,7 @@ export class DashboardComponent implements OnInit {
         }
       },
       error => {
-        console.log("some error occured. Couldn't save list status");
+        console.log("some error occured. Couldn't save sub task");
         console.log(error)
       }
     )
@@ -367,5 +416,60 @@ export class DashboardComponent implements OnInit {
       }
     )
   }
+
+  deleteSubTask(id) {
+    this.appService.deleteSubTask(this.activeTask.taskId, id).subscribe(
+      response => {
+        if (response.status === 200) {
+          this.getSingleTask(this.activeTask.taskId)
+        } else {
+          this.snackBar.open(response.message, 'Close', { duration: 4000, });
+          console.log(response.message)
+        }
+      },
+      error => {
+        this.snackBar.open(error.error.message, 'Close', { duration: 4000, });
+        console.log("some error occured");
+        console.log(error)
+      }
+    )
+  }
+
+  loadCalender(): any {
+
+    this.calendarOptions = {
+      editable: false,
+      eventLimit: false,
+      header: {
+        left: 'prev,next today',
+        center: '',
+        right: 'title',
+      },
+      timezone: 'local',
+      eventTextColor: 'white',
+      timeFormat: 'h(:mm)t',
+      height: 'parent'
+    };//end calenderOptions
+
+  }
+
+  verifyUserConfirmation: any = () => {
+    this.SocketService.verifyUser()
+      .subscribe((data) => {
+        this.SocketService.setUser(this.authToken);
+      });
+  }
+
+  getNotifications(): any {
+    this.SocketService.notification().subscribe((data) => {
+      console.log('NOTIFICATION RECEIVED FROM SERVER!')
+      console.log(data);
+      this.notification = { event: data.event, friendId: data.friendId, userName: data.userName, display: true }
+      if (data.event === 'Friend request received') {
+        this.userDetails.friendRequests.push(data.friendId)
+        this.appService.setUserInfoInLocalStorage(this.userDetails)
+      }
+    });
+  }//end getAlerts
 
 }// end DashboardComponent class

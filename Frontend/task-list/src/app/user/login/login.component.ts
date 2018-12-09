@@ -46,11 +46,11 @@ export class LoginComponent implements OnInit {
 
           Cookie.set('authtoken', response.data.authToken);
 
-          Cookie.set('receiverId', response.data.userDetails ? response.data.userDetails.userId : response.data.adminDetails.adminId);
+          Cookie.set('receiverId', response.data.userDetails.userId);
 
-          Cookie.set('receiverName', response.data.userDetails ? response.data.userDetails.firstName + ' ' + response.data.userDetails.lastName : response.data.adminDetails.firstName + ' ' + response.data.adminDetails.lastName);
+          Cookie.set('receiverName', response.data.userDetails.firstName + ' ' + response.data.userDetails.lastName);
 
-          this.appService.setUserInfoInLocalStorage(response.data.userDetails ? response.data.userDetails : response.data.adminDetails)
+          this.appService.setUserInfoInLocalStorage(response.data.userDetails)
 
           setTimeout(() => {
             this.showProgressBar = false;

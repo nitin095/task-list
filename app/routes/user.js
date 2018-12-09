@@ -85,43 +85,7 @@ module.exports.setRouter = (app) => {
 	    "data": null
 	   }
 	 */
-
-
-	app.get(`${baseUrl}/:userId/friends`, userController.getFriends);
-
-    /**
-	 * @api {get} /api/v1/users/:userId/friends Get all friends of user
-	 * @apiVersion 0.0.1
-	 * @apiGroup read
-	 *
-	 * @apiParam {String} authToken The token for authentication.(Send authToken as query parameter, body parameter or as a header)
-	 * @apiParam {String} userId The userId should be passed as the URL parameter
-	 *
-	 *  @apiSuccessExample {json} Success-Response:
-	 *  {
-	    "error": false,
-	    "message": "User Found Successfully.",
-	    "status": 200,
-	    "data": {
-            userId: "string",
-            firstName: "string",
-            lastName: "string",
-            email: "mstring",
-            countryCode: number,
-            mobileNumber: number,
-            createdOn: "Date",
-				}
-	    }
-	  @apiErrorExample {json} Error-Response:
-	 *
-	 * {
-	    "error": true,
-	    "message": "Error Occured.",
-	    "status": 500,
-	    "data": null
-	   }
-	 */
-
+	
 
 	app.get(`${baseUrl}/friends`, userController.searchFriends);
 

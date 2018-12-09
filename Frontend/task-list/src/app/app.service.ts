@@ -55,25 +55,25 @@ export class AppService {
     return response
   }
 
-  editUser(userType, userId, data): Observable<any> {
+  editUser(userId, data): Observable<any> {
     this.authToken = Cookie.get('authtoken');
-    let response = this._http.put(`${this.baseUrl}/${userType}/${userId}/edit?authToken=${this.authToken}`, data)
+    let response = this._http.put(`${this.baseUrl}/users/${userId}/edit?authToken=${this.authToken}`, data)
     return response
   }
 
-  deleteUser(userType, userId): Observable<any> {
+  deleteUser(userId): Observable<any> {
     this.authToken = Cookie.get('authtoken');
-    let response = this._http.post(`${this.baseUrl}/${userType}/${userId}/delete?authToken=${this.authToken}`, '')
+    let response = this._http.post(`${this.baseUrl}/users/${userId}/delete?authToken=${this.authToken}`, '')
     return response
   }
 
-  recoverPassword(userType, data): Observable<any> {
-    let response = this._http.put(`${this.baseUrl}/${userType}/forgotPassword`, data)
+  recoverPassword(data): Observable<any> {
+    let response = this._http.put(`${this.baseUrl}/users/forgotPassword`, data)
     return response
   }
 
-  resetPassword(userType, data): Observable<any> {
-    let response = this._http.put(`${this.baseUrl}/${userType}/resetPassword`, data)
+  resetPassword(data): Observable<any> {
+    let response = this._http.put(`${this.baseUrl}/users/resetPassword`, data)
     return response
   }
 
@@ -144,8 +144,18 @@ export class AppService {
     return response
   }
 
-  getAllTasks(): Observable<any> {
-    let response = this._http.get(`${this.baseUrl}/tasks/all`)
+  deleteSubTask(taskId,subTask_id): Observable<any> {
+    let response = this._http.post(`${this.baseUrl}/tasks/${taskId}/${subTask_id}/delete`,'')
+    return response
+  }
+
+  setSubTaskStatus(taskId, subTask_id, isDone): Observable<any> {
+    let response = this._http.put(`${this.baseUrl}/tasks/${taskId}/${subTask_id}/status`, {isDone: isDone})
+    return response
+  }
+
+  getAllTasks(userId): Observable<any> {
+    let response = this._http.get(`${this.baseUrl}/tasks/all/${userId}`)
     return response
   }
 

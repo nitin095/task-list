@@ -189,8 +189,7 @@ let createSubTaskComment = (req, res) => {
 let getAllTasks = (req, res) => {
 
     let filter = req.query.fields ? req.query.fields.replace(new RegExp(";", 'g'), " ") : '';
-    // taskModel.find({ 'createdBy': req.query.userId })
-    taskModel.find()
+    taskModel.find({ 'createdBy': req.params.userId })
         .select(`-__v ${filter}`)
         .lean()
         .exec((err, result) => {
@@ -306,12 +305,30 @@ let editComment = (req, res) => {
 
 }// end edit comment
 
+let setSubTaskStatus = (req, res) => {
+    taskModel.updateOne({ 'taskId': req.params.taskId, 'subTask._id': req.params.subTask_id },
+        { $set: { 'subTask.$.isDone': req.body.isDone } }, (err, result) => {
+            if (err) {
+                console.log(err)
+                logger.error(err.message, 'task Controller: editSubTask', 10)
+                let apiResponse = response.generate(true, 'Failed To edit subTask', 500, null)
+                res.send(apiResponse)
+            } else if (check.isEmpty(result)) {
+                logger.info('No subTask Found', 'task Controller: editSubTask')
+                let apiResponse = response.generate(true, 'No subtask Found', 404, null)
+                res.send(apiResponse)
+            } else {
+                let apiResponse = response.generate(false, 'Subtask edited', 200, result)
+                res.send(apiResponse)
+            }
+        })
+}
 
 // Edit comment
 let editSubTaskComment = (req, res) => {
 
     taskModel.updateOne({ 'taskId': req.params.taskId, 'subTask._id': req.body.subTask_id },
-        { $set: { 'subTask.$.comments': { body: req.body.body } } }, function (err, result) {
+        { $set: { 'subTask.$.comments': { body: req.body.body } } }, (err, result) => {
             if (err) {
                 console.log(err)
                 logger.error(err.message, 'task Controller: editSubTaskComment', 10)
@@ -351,6 +368,24 @@ let deleteTask = (req, res) => {
 
 }// end delete task
 
+let deleteSubTask = (req, res) => {
+    taskModel.updateOne(
+        { taskId: req.params.taskId },
+        { $pull: { subTask: { _id: req.params.subTask_id } } },
+        (error, result) => {
+            if (error) {
+                console.log('Error Occured.')
+                logger.error(`Error Occured : ${error}`, 'Database', 10)
+                let apiResponse = response.generate(true, 'Error Occured.', 500, null)
+                res.send(apiResponse);
+            } else {
+                // result.comments.push(newComment)
+                console.log('Success in comment creation')
+                let apiResponse = response.generate(false, 'Comment created.', 200, result)
+                res.send(apiResponse);
+            }
+        });
+}
 
 // Delete task
 let deleteComment = (req, res) => {
@@ -408,9 +443,11 @@ module.exports = {
     getListTasks: getListTasks,
     getSingleTask: getSingleTask,
     editTask: editTask,
+    setSubTaskStatus: setSubTaskStatus,
     editComment: editComment,
     editSubTaskComment: editSubTaskComment,
     deleteTask: deleteTask,
+    deleteSubTask: deleteSubTask,
     deleteComment: deleteComment,
     deleteSubTaskComment: deleteSubTaskComment
 

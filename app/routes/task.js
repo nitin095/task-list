@@ -11,7 +11,7 @@ module.exports.setRouter = (app) => {
 
 	// defining routes.
 
-	app.get(`${baseUrl}/all`, taskController.getAllTasks);
+	app.get(`${baseUrl}/all/:userId`, taskController.getAllTasks);
 
     /**
 	 * @api {get} /api/v1/tasks/view/all Get all tasks
@@ -288,6 +288,42 @@ module.exports.setRouter = (app) => {
 	   }
 	 */
 
+	app.put(`${baseUrl}/:taskId/:subTask_id/status`, taskController.setSubTaskStatus);
+
+    /**
+	 * @api {put} /api/v1/blogs/:taskId/edit Edit task by taskId
+	 * @apiVersion 0.0.1
+	 * @apiGroup edit
+	 *
+	 * @apiParam {String} authToken The token for authentication.(Send authToken as query parameter, body parameter or as a header)
+	 * @apiParam {String} taskId taskId of the task passed as the URL parameter
+	 *
+	 *  @apiSuccessExample {json} Success-Response:
+	 *  {
+	    "error": false,
+	    "message": "Task Edited Successfully.",
+	    "status": 200,
+	    "data": [
+					{
+						taskId: "string",
+						firstName: "string",
+						lastName: "string",
+                        email: "string",
+                        countryCode: number,
+						moile: number,
+						lastModified: "date"
+					}
+	    		]
+		}
+	  @apiErrorExample {json} Error-Response:
+	 *
+	 * {
+	    "error": true,
+	    "message": "Error Occured.,
+	    "status": 500,
+	    "data": null
+	   }
+	 */
 
 	app.put(`${baseUrl}/:taskId/edit/comment`, taskController.editComment);
 
@@ -396,6 +432,34 @@ module.exports.setRouter = (app) => {
 	   }
 	 */
 
+	app.post(`${baseUrl}/:taskId/:subTask_id/delete`, taskController.deleteSubTask);
+
+    /**
+	 * @api {post} /api/v1/tasks/delete Delete task by taskId
+	 * @apiVersion 0.0.1
+	 * @apiGroup delete
+	 *
+	 * @apiParam {String} authToken The token for authentication.(Send authToken as query parameter, body parameter or as a header)
+	 * @apiParam {String} taskId taskId of the task passed as the URL parameter
+	 *
+	 *  @apiSuccessExample {json} Success-Response:
+	 *  {
+	    "error": false,
+	    "message": "Task Deleted Successfully",
+	    "status": 200,
+	    "data": []
+	    	}
+		}
+	}
+	  @apiErrorExample {json} Error-Response:
+	 *
+	 * {
+	    "error": true,
+	    "message": "Error Occured.,
+	    "status": 500,
+	    "data": null
+	   }
+	 */
 
 	 
 	app.post(`${baseUrl}/:taskId/comment/delete`, taskController.deleteComment);

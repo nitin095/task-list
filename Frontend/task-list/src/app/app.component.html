@@ -1,35 +1,73 @@
 <nav class="sticky-top">
-  <mat-toolbar style="background:inherit">
+  <mat-toolbar class="d-none d-sm-flex">
     <span class="logo" [routerLink]="['/home']">TASK LIST</span>
     <span class="nav-spacer"></span>
     <div class="search">
       <input type="text" placeholder="Search tasks" (keyup.enter)="searchTasks()">
       <div class="search-result-container" *ngIf="showResults">
         <div class="container">
-          <div class="row" *ngFor="let task of searchResults" [routerLink]="['/dashboard']" [queryParams]="{taskId: task.taskId}" (click)="showResults=false">
+          <div class="row" *ngFor="let task of searchResults" [routerLink]="['/dashboard']" [queryParams]="{taskId: task.taskId}"
+            (click)="showResults=false">
             <div class="col-12">{{task.title}}</div>
             <small class="col-auto" *ngIf="task.dueDate">Due on {{task.dueDate | date}}</small>
           </div>
         </div>
       </div>
     </div>
-    <button mat-icon-button matTooltip="Dashboard" *ngIf="url.includes('friends')" [routerLink]="['/dashboard']">
+    <button class="px-1" mat-icon-button matTooltip="Dashboard" *ngIf="url.includes('friends')||url.includes('profile')"
+      [routerLink]="['/dashboard']">
       <mat-icon>dashboard</mat-icon>
     </button>
-    <button mat-icon-button matTooltip="Friends" *ngIf="url.includes('dashboard')" [routerLink]="['/friends']">
+    <button class="px-1" mat-icon-button matTooltip="Friends" *ngIf="url.includes('dashboard')||url.includes('profile')"
+      [routerLink]="['/friends']">
       <mat-icon>group</mat-icon>
     </button>
-    <button mat-icon-button matTooltip="Notifications">
+    <button class="px-1" mat-icon-button matTooltip="Notifications">
       <mat-icon>notifications</mat-icon>
     </button>
     <button class="nav-btn" mat-stroked-button color="primary" *ngIf="url.includes('home')" [routerLink]="['/login']"
       (click)="reload()">Login</button>
-    <button mat-icon-button (click)="logout()" *ngIf="!url.includes('home') && !url.includes('login')">
-      <mat-icon>power_settings_new</mat-icon>
-    </button>
-    <!-- <button class="nav-btn" mat-stroked-button color="primary" *ngIf="!url.includes('home') && !url.includes('login')"
-      (click)="logout()">Logout</button> -->
+    <div matRipple class="ml-2 circle" [matMenuTriggerFor]="menu" *ngIf="!url.includes('home') && !url.includes('login')">{{getInitials()}}</div>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item [routerLink]="['profile']">
+        <mat-icon>person</mat-icon>
+        <span>View profile</span>
+      </button>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>exit_to_app</mat-icon>
+        <span>Logout</span>
+      </button>
+    </mat-menu>
   </mat-toolbar>
+
+  <mat-toolbar class="d-sm-none">
+    <span class="logo" [routerLink]="['/home']">TASK LIST</span>
+    <span class="nav-spacer"></span>
+    <button class="nav-btn" mat-stroked-button color="primary" *ngIf="url.includes('home')" [routerLink]="['/login']"
+    (click)="reload()">Login</button>
+    <div matRipple class="ml-2 circle" [matMenuTriggerFor]="smallMenu" *ngIf="!url.includes('home') && !url.includes('login')">{{getInitials()}}</div>
+    <mat-menu #smallMenu="matMenu">
+      <button mat-menu-item *ngIf="url.includes('friends')||url.includes('profile')"
+        [routerLink]="['/dashboard']">
+        <mat-icon>dashboard</mat-icon>
+        <span>Dashoard</span>
+      </button>
+      <button mat-menu-item *ngIf="url.includes('dashboard')||url.includes('profile')"
+        [routerLink]="['/friends']">
+        <mat-icon>group</mat-icon>
+        <span>Friends</span>
+      </button>
+      <button mat-menu-item [routerLink]="['profile']">
+        <mat-icon>person</mat-icon>
+        <span>View profile</span>
+      </button>
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>exit_to_app</mat-icon>
+        <span>Logout</span>
+      </button>
+    </mat-menu>
+  </mat-toolbar>
+
 </nav>
 
 <router-outlet></router-outlet>

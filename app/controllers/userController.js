@@ -9,7 +9,8 @@ const validateInput = require('../libs/paramsValidationLib');
 const check = require('../libs/checkLib');
 const token = require('../libs/tokenLib');
 const AuthModel = mongoose.model('Auth');
-const mailer = require('../libs/mailer')
+const mailer = require('../libs/mailer');
+const socketLib = require('./../libs/socketLib');
 
 // Models 
 const UserModel = mongoose.model('User')
@@ -420,44 +421,6 @@ let logout = (req, res) => {
 } // end logout function.
 
 
-let getFriends = (req, res) => {
-
-    UserModel.findOne({ userId: req.params.userId }, (err, user) => {
-        if (err) {
-            console.log(err)
-            logger.error('Failed To find user', 'userController: getFriends()', 10)
-            let apiResponse = response.generate(true, 'Failed To Find User Details', 500, null)
-            res.send(apiResponse)
-        } else if (check.isEmpty(user)) {
-            logger.error('No User Found', 'userController: getFriends()', 7)
-            let apiResponse = response.generate(true, 'No User Found', 404, null)
-            res.send(apiResponse)
-        } else {
-            let friends = user.friends;
-            if (check.isEmpty(friends)) {
-                let apiResponse = response.generate(true, 'No friend Found', 404, null)
-                res.send(apiResponse)
-            } else {
-                UserModel.find({ userId: friends })
-                    .select(' -__v -_id -password -createdOn -lastModified')
-                    .lean()
-                    .exec((err, friends) => {
-                        if (err) {
-                            console.log(err)
-                            logger.error('Failed To find friends', 'userController: getFriends()', 10)
-                            let apiResponse = response.generate(true, 'Failed To Find User Friends', 500, null)
-                            res.send(apiResponse)
-                        } else {
-                            let apiResponse = response.generate(false, 'User Friends found', 200, friends)
-                            res.send(apiResponse)
-                        }
-                    })
-            }
-        }
-    })
-}// end getFriends
-
-
 let addFriend = (req, res) => {
 
     let saveRequest = () => {
@@ -529,6 +492,15 @@ let addFriend = (req, res) => {
             let apiResponse = response.generate(false, 'Friend request sent', 200, userDetails)
             res.status(200)
             res.send(apiResponse)
+
+            //sending notification to friend request receiver
+            let notification = {
+                event: 'Friend request received',
+                friendId: req.params.userId,
+                receiverId: [req.body.friendId],
+                userName: `${userDetails.firstName} ${userDetails.lastName}`,
+            }
+            socketLib.sendNotification(notification)
         })
         .catch((err) => {
             console.log("errorhandler");
@@ -612,11 +584,20 @@ let acceptFriendRequest = (req, res) => {
 
     updateFriendList()
         .then(updateSenderFriendList)
-        .thrn(getUpdatedUserDetails)
+        .then(getUpdatedUserDetails)
         .then((userDetails) => {
             let apiResponse = response.generate(false, 'Friend request accepted', 200, userDetails)
             res.status(200)
             res.send(apiResponse)
+
+            //sending notification to friend request sender
+            let notification = {
+                event: 'Friend request accepted',
+                receiverId: [req.body.friendId],
+                friendId: req.params.userId,
+                friendName: `${userDetails.firstName} ${userDetails.lastName}`,
+            }
+            socketLib.sendNotification(notification)
         })
         .catch((err) => {
             console.log("errorhandler");
@@ -696,7 +677,7 @@ let cancelSentRequest = (req, res) => {
 
     removeSentRequest()
         .then(removeReceivedRequest)
-        .thrn(getUpdatedUserDetails)
+        .then(getUpdatedUserDetails)
         .then((userDetails) => {
             let apiResponse = response.generate(false, 'Friend request cancelled', 200, userDetails)
             res.status(200)
@@ -785,6 +766,15 @@ let ignoreReceivedRequest = (req, res) => {
             let apiResponse = response.generate(false, 'Friend request ignored', 200, userDetails)
             res.status(200)
             res.send(apiResponse)
+
+            //sending notification to friend request sender
+            let notification = {
+                event: 'Friend request declined',
+                receiverId: [req.body.friendId],
+                friendId: req.params.userId,
+                friendName: `${userDetails.firstName} ${userDetails.lastName}`,
+            }
+            socketLib.sendNotification(notification)
         })
         .catch((err) => {
             console.log("error handler");
@@ -794,6 +784,7 @@ let ignoreReceivedRequest = (req, res) => {
         })
 
 }
+
 
 let removeFriend = (req, res) => {
 
@@ -866,6 +857,14 @@ let removeFriend = (req, res) => {
             let apiResponse = response.generate(false, 'Friend removed', 200, userDetails)
             res.status(200)
             res.send(apiResponse)
+            //sending notification to removed friend
+            let notification = {
+                event: 'Friend removed',
+                receiverId: [req.body.friendId],
+                friendId: req.params.userId,
+                friendName: `${userDetails.firstName} ${userDetails.lastName}`,
+            }
+            socketLib.sendNotification(notification)
         })
         .catch((err) => {
             console.log("errorhandler");
@@ -943,7 +942,6 @@ module.exports = {
     resetPassword: resetPassword,
     addFriend: addFriend,
     removeFriend: removeFriend,
-    getFriends: getFriends,
     acceptFriendRequest: acceptFriendRequest,
     cancelSentRequest: cancelSentRequest,
     ignoreReceivedRequest: ignoreReceivedRequest,
