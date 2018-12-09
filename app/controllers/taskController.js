@@ -349,7 +349,6 @@ let editSubTaskComment = (req, res) => {
 
 // Delete task
 let deleteTask = (req, res) => {
-
     taskModel.findOneAndRemove({ 'taskId': req.params.taskId }).exec((err, result) => {
         if (err) {
             console.log(err)
@@ -389,7 +388,6 @@ let deleteSubTask = (req, res) => {
 
 // Delete task
 let deleteComment = (req, res) => {
-
     taskModel.updateOne(
         { taskId: req.params.taskId },
         { $pull: { comments: { _id: req.body.comment_id } } },
@@ -400,8 +398,7 @@ let deleteComment = (req, res) => {
                 let apiResponse = response.generate(true, 'Error Occured.', 500, null)
                 res.send(apiResponse);
             } else {
-                // result.comments.push(newComment)
-                console.log('Success in comment creation')
+                console.log('comment deleted')
                 let apiResponse = response.generate(false, 'Comment created.', 200, result)
                 res.send(apiResponse);
             }

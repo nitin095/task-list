@@ -50,11 +50,11 @@ export class AppComponent {
     return initials
   }
 
-  searchTasks() {
+  searchTasks(search) {
     this.appService.getAllTasks(this.userDetails.userId).subscribe(
       response => {
+        this.searchResults = response.data.filter(task => task.title.includes(search))
         this.showResults = true;
-        this.searchResults = response.data
       },
       error => {
         console.log(error)

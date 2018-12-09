@@ -20,7 +20,7 @@ export class SocketService {
     this.socket = io(this.url);
   }
 
-  
+
   // Listening events 
 
   public verifyUser = () => {
@@ -41,7 +41,6 @@ export class SocketService {
   } // end onlineUserList
 
   public notification = () => {
-    console.log('listening notifications from server for receiverId: ' + this.receiverId)
     return Observable.create((observer) => {
       this.socket.on(this.receiverId, (notifications) => {
         observer.next(notifications);

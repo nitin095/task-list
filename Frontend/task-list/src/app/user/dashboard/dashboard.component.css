@@ -1,9 +1,24 @@
 .container-fluid{
     height:90vh;
     overflow: hidden;
+    position: relative;
+}
+.loader{
+    position: absolute;
+    top: 0;
+    z-index: 2;
+    /* right: 0; */
+    height: 8px;
+    width: 100vw;
 }
 mat-drawer-container{
   height: 100%;
+}
+.grey{
+    color: grey
+}
+.text-bold{
+    font-weight: bold
 }
 .main-row{
     height: 100%
@@ -11,6 +26,15 @@ mat-drawer-container{
 .side-nav-col{
     background: whitesmoke;
     cursor: default
+}
+.side-nav-col mat-icon{
+    color: grey
+}
+.active{
+    color: #197bd8!important
+}
+.active-bg{
+    background-color: rgba(175, 210, 250, 0.829)
 }
 button:focus{
 outline: none
@@ -41,6 +65,14 @@ mat-drawer span{
     padding-right: 2rem;
     padding-left: 0.5rem;
 }
+.imp{
+    color: #197bd8;
+    cursor: pointer;
+}
+.not-imp{
+    color: grey;
+    cursor: pointer;
+}
 .new-list-link input{
     background: none;
     border: none;
@@ -63,7 +95,8 @@ mat-list{
     padding: 0.5rem 1rem;
 }
 .task-list-item{
-    transition: all 0.2s ease
+    transition: all 0.2s ease;
+    border-bottom: 1px solid lightgrey
 }
 .task-list-item:hover{
     /* border-radius: 15px; */
@@ -84,6 +117,16 @@ mat-list{
     background-color: rgb(207, 226, 252);
     /* padding-bottom: 1rem */
 }
+.header-btn{
+    cursor: pointer;
+    transition: all 0.3s ease
+}
+.header-btn:hover{
+    color: #197bd8
+}
+.header-btn:hover mat-icon{
+    color: #197bd8
+}
 mat-card-title{
     margin: 0
 }
@@ -94,7 +137,11 @@ mat-card-title{
 }
 .task-due-date{
     font-size: 0.9rem;
-    color: rgb(233, 23, 23)
+    color: rgb(233, 23, 23);
+}
+.task-due-date:hover{
+    text-decoration: underline;
+    cursor: pointer;
 }
 .task-delete-card{
     transition: all 0.3s ease
@@ -161,7 +208,43 @@ input.comment-editing:active{
 .sticky{
     position: sticky
 }
-
+.no-focus:focus{
+    outline: none
+}
+.friends-list-container{
+    /* position: fixed; */
+    top: 20%;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    height: 50vh;
+    width: 50vw;
+    border-radius: 18px;
+    background-color: rgba(255, 255, 255, 0.9);
+    z-index: 99;
+    -webkit-box-shadow: 0px 0px 35px -7px rgba(0,0,0,0.75);
+-moz-box-shadow: 0px 0px 35px -7px rgba(0,0,0,0.75);
+box-shadow: 0px 0px 35px -7px rgba(0,0,0,0.75);
+}
+.friend-chip{
+    padding: 0.2rem 1rem;
+    padding-bottom: 0.3rem;
+    border: 2px solid;
+    border-color: #197bd8;
+    border-radius: 15px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.3s ease
+}
+.friend-chip:hover{
+    background-color: #197bd8;
+    color: #fff
+}
+.selected-chip{
+    background-color: #197bd8;
+    color: #fff
+}
 /* Media queries */
 
 /*extra small devices*/

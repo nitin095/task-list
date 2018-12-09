@@ -63,6 +63,16 @@ button:focus{
 .search > input:focus{
    outline: none
 }
+.search-header-row{
+    font-weight: bold
+}
+.search-header-row:hover{
+    background-color: #fff!important
+}
+.search-header-row mat-icon{
+    color: grey;
+    cursor: pointer;
+}
 
 .search-result-container{
     position: absolute;

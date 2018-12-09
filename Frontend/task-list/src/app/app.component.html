@@ -1,11 +1,19 @@
 <nav class="sticky-top">
+  
   <mat-toolbar class="d-none d-sm-flex">
     <span class="logo" [routerLink]="['/home']">TASK LIST</span>
+   
     <span class="nav-spacer"></span>
+
+    <!-- tasks search -->
     <div class="search">
-      <input type="text" placeholder="Search tasks" (keyup.enter)="searchTasks()">
+      <input type="text" #searcInput placeholder="Search tasks" (keyup.enter)="searchTasks(searcInput.value)">
       <div class="search-result-container" *ngIf="showResults">
         <div class="container">
+          <div class="row justify-content-between search-header-row">
+            <div class="col-auto">{{searchResults.length}} results</div>
+            <div class="col-auto pt-1"><mat-icon (click)="showResults=false">close</mat-icon></div>
+          </div>
           <div class="row" *ngFor="let task of searchResults" [routerLink]="['/dashboard']" [queryParams]="{taskId: task.taskId}"
             (click)="showResults=false">
             <div class="col-12">{{task.title}}</div>

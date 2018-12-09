@@ -462,7 +462,7 @@ module.exports.setRouter = (app) => {
 	 */
 
 	 
-	app.post(`${baseUrl}/:taskId/comment/delete`, taskController.deleteComment);
+	app.post(`${baseUrl}/:taskId/commentDelete`, taskController.deleteComment);
 
     /**
 	 * @api {post} /api/v1/tasks/delete Delete task by taskId

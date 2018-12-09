@@ -1,24 +1,29 @@
 /* You can add global styles to this file, and also import other style files */
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
+@import url('https://fonts.googleapis.com/css?family=Work+Sans:400');
 
-
+.fc{
+  font-family: 'Work Sans', sans-serif;
+}
 .fc-toolbar{
     padding-top: 1rem
+}
+.fc-center{
+  color: rgb(188, 189, 189);
+  padding-right: 2rem;
 }
 .fc-button{
     background: none;
     text-transform: capitalize;
-    color: #633670;
+    color: #197bd8;
     border: none;
-    /* border: 1px solid #4e2156; */
-    /* border-radius: 20px; */
 }
 .fc-button.fc-state-default{
     border-radius: 0
 }
 .fc-button.fc-state-active{
     box-shadow: none;
-    border-bottom: 1px solid #633670;
+    border-bottom: 1px solid #197bd8;
     border-radius: 0;
     font-weight: 600;
     z-index: inherit;
@@ -27,8 +32,9 @@
     outline: none
 }
 .fc-button:hover{
-    background: #ede3f7
+    background: #e3ecf7
 }
+.
 
 
 

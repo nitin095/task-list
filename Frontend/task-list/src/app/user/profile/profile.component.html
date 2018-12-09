@@ -3,10 +3,10 @@
     <div class="row my-5 align-items-center">
       <div class="col-12 col-sm-auto display-4">Profile</div>
       <div class="col-auto">
-        <button (click)="editProfile()" class="mt-3" mat-stroked-button matTooltip="Edit profile" color="accent">Edit</button>
+        <button (click)="editProfile()" class="mt-3" mat-stroked-button matTooltip="Edit profile" color="primary">Edit</button>
       </div>
       <div class="col-auto">
-        <button class="mt-3" mat-stroked-button matTooltip="Change your password" color="accent" data-toggle="modal"
+        <button class="mt-3" mat-stroked-button matTooltip="Change your password" color="primary" data-toggle="modal"
           data-target="#passwordChangeModal">Change password</button>
       </div>
     </div>
@@ -67,16 +67,16 @@
   
     <div class="row pt-2 pb-5 align-items-center">
       <div class="col-auto">
-        <button class="mt-3" *ngIf="edit" (click)="saveUserDetails()" mat-raised-button color="warn">Save</button>
+        <button class="mt-3" *ngIf="edit" (click)="saveUserDetails()" mat-raised-button color="primary">Save</button>
       </div>
       <div class="col-auto">
-        <button *ngIf="edit" (click)="cancelEditProfile()" class="mt-3" mat-stroked-button color="warn">Cancel</button>
+        <button *ngIf="edit" (click)="cancelEditProfile()" class="mt-3" mat-stroked-button color="primary">Cancel</button>
       </div>
     </div>
   
     <div class="row py-2">
       <div class="col-auto">
-        <button mat-button color="warn" data-toggle="modal" data-target="#deleteAccountModal">Delete account.</button>
+        <button mat-button color="primary" data-toggle="modal" data-target="#deleteAccountModal">Delete account.</button>
       </div>
     </div>
   
@@ -95,8 +95,8 @@
             You'll get password reset link in your email.
           </div>
           <div class="modal-footer">
-            <button mat-stroked-button color="accent" data-dismiss="modal">Close</button>
-            <button mat-stroked-button color="primary" data-dismiss="modal" (click)="recoverPassword()">Recover password</button>
+            <button mat-stroked-button color=primary data-dismiss="modal">Close</button>
+            <button mat-raised-button color="primary" data-dismiss="modal" (click)="recoverPassword()">Recover password</button>
           </div>
         </div>
       </div>
@@ -120,7 +120,7 @@
             Are you sure you want to delte your account? This action is not reversible.
           </div>
           <div class="modal-footer">
-            <button mat-stroked-button color="accent" data-dismiss="modal">Close</button>
+            <button mat-stroked-button color="primary" data-dismiss="modal">Close</button>
             <button mat-stroked-button color="primary" data-dismiss="modal" (click)="deleteUser()">Yes delete my account</button>
           </div>
         </div>

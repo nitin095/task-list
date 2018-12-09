@@ -1,24 +1,29 @@
 <div class="container-fluid">
-    <mat-progress-bar mode="indeterminate" [style.opacity]="showProgressBar == true ? '1': '0'"></mat-progress-bar>
+  <mat-progress-bar class="loader" mode="indeterminate" [style.opacity]="showProgressBar == true ? '1': '0'"></mat-progress-bar>
   <div class="row main-row">
 
-    <div class="side-nav-col">
+    <div class="side-nav-col" #isActive>
       <div class="vh10">
         <button mat-icon-button (click)="drawer.toggle()">
           <mat-icon>menu</mat-icon>
         </button>
       </div>
-      <div class="vh10" (click)="activeList=null;loadCalender()">
-        <mat-icon>wb_sunny</mat-icon>
+      <div class="vh10" (click)="activeList=null;isActive.value='day'">
+        <mat-icon [ngClass]="{'active': isActive.value=='day'}">wb_sunny</mat-icon>
       </div>
-      <div class="vh10" (click)="activeList=null;loadCalender()">
-        <mat-icon>date_range</mat-icon>
+      <div class="vh10 no-focus" (click)="activeList=null;showImportantList=true;calendarOptions = null;isActive.value='imp'"
+        [routerLink]="['/dashboard']">
+        <mat-icon [ngClass]="{'active': isActive.value=='imp'}">bookmark</mat-icon>
       </div>
-      <div class="vh10 side-nav-icon" *ngFor="let list of lists">
-        <mat-icon>list</mat-icon>
+      <div class="vh10" (click)="activeList=null;showImportantList=false;loadCalender();isActive.value='cal'">
+        <mat-icon [ngClass]="{'active': isActive.value=='cal'}">date_range</mat-icon>
       </div>
-      <div class="vh10">
-        <mat-icon>add</mat-icon>
+      <div class="vh10 side-nav-icon" *ngFor="let list of lists" (click)="makeListActive(list);isActive.value=list.listId"
+        matTooltip="{{list.title}}">
+        <mat-icon [ngClass]="{'active': isActive.value==list.listId}">list</mat-icon>
+      </div>
+      <div class="vh10" (click)="drawer.open()">
+        <mat-icon style="color: #197bd8">add</mat-icon>
       </div>
 
     </div>
@@ -29,13 +34,19 @@
         <!-- drawer -->
         <mat-drawer #drawer [mode]="mobileQuery.matches ? 'over' : 'side'" opened="true">
           <div class="vh10"></div>
-          <div class="vh10" style="justify-content: flex-start">
+          <div class="vh10" style="justify-content: flex-start" (click)="isActive.value='day'" [ngClass]="{'active-bg': isActive.value=='day'}">
             <span>Today</span>
           </div>
-          <div class="vh10" style="justify-content: flex-start" (click)="activeList=null;loadCalender()">
+          <div class="vh10 no-focus" style="justify-content: flex-start" (click)="activeList=null;showImportantList=true;calendarOptions = null;isActive.value='imp'"
+            [routerLink]="['/dashboard']" [ngClass]="{'active-bg': isActive.value=='imp'}">
+            <span>Important</span>
+          </div>
+          <div class="vh10" style="justify-content: flex-start" (click)="activeList=null;showImportantList=false;loadCalender();isActive.value='cal'"
+            [ngClass]="{'active-bg': isActive.value=='cal'}">
             <span>Calendar</span>
           </div>
-          <div class="vh10" *ngFor="let list of lists" style="justify-content: flex-start" (click)="makeListActive(list)">
+          <div class="vh10" *ngFor="let list of lists" style="justify-content: flex-start" (click)="makeListActive(list);isActive.value=list.listId"
+            [ngClass]="{'active-bg': isActive.value==list.listId}">
             <div style="display: inline-flex;justify-content: space-between;width:100%">
               <span>{{list.title}}</span>
               <span>1</span>
@@ -61,17 +72,17 @@
             </div>
             <div class="col-12 col-lg-auto py-3 py-sm-0">
               <div class="row justify-content-end">
-                <div class="col-3 col-sm-2">
+                <div class="col-3 col-sm-2 header-btn" (click)="getFriends()">
                   <div class="row text-center p-0">
-                    <div class="col-12">
+                    <div class="col-12 grey">
                       <mat-icon>person_add</mat-icon>
                     </div>
                     <small class="col-12" style="line-height:0.1rem">Share</small>
                   </div>
                 </div>
-                <div class="col-3 col-sm-2">
+                <div class="col-3 col-sm-2 header-btn">
                   <div class="row text-center p-0">
-                    <div class="col-12">
+                    <div class="col-12 grey">
                       <mat-icon>sort</mat-icon>
                     </div>
                     <small class="col-12" style="line-height:0.1rem">Sort</small>
@@ -80,10 +91,10 @@
                 <div class="col-6 col-sm-5">
                   <div class="row text-center">
                     <small class="col-12 pb-2">
-                      {{activeListCompletedTasks}} of {{activeList.tasks.length}} tasks completed
+                      {{activeListCompletedTasks}} of {{activeListTasks.length}} tasks completed
                     </small>
                     <div class="col-12">
-                      <mat-progress-bar mode="determinate" value="{{tasksProgress}}"></mat-progress-bar>
+                      <mat-progress-bar mode="determinate" value="{{listProgress}}"></mat-progress-bar>
                     </div>
                   </div>
                 </div>
@@ -130,18 +141,19 @@
                   <small>Due by {{task.dueDate | date}}</small>
                 </div>
                 <div class="col-1">
-                  <mat-icon>bookmark_border</mat-icon>
+                  <mat-icon class="not-imp" *ngIf="!task.isImportant" (click)="task.isImportant=true;saveTask({isImportant:true},task.taskId)">bookmark_border</mat-icon>
+                  <mat-icon class="imp" *ngIf="task.isImportant" (click)="task.isImportant=false;saveTask({isImportant:false},task.taskId)">bookmark</mat-icon>
                 </div>
               </div>
               <div class="row pt-2">
-                  <div class="col-1 pt-1" style="display:flex;justify-content:center">
-                    <mat-icon>add</mat-icon>
-                  </div>
-                  <div class="col">
-                    <span class="lead new-list-link"><input type="text" #taskTitle (keyup.enter)="createNewTask(taskTitle.value);taskTitle.value=null"
-                        placeholder="Add a task"></span>
-                  </div>
+                <div class="col-1 pt-1" style="display:flex;justify-content:center">
+                  <mat-icon>add</mat-icon>
                 </div>
+                <div class="col">
+                  <span class="lead new-list-link"><input type="text" #taskTitle (keyup.enter)="createNewTask(taskTitle.value);taskTitle.value=null"
+                      placeholder="Add a task"></span>
+                </div>
+              </div>
             </div>
 
           </div>
@@ -164,7 +176,7 @@
                   <span class="lead" style="font-weight:bold">{{activeTask.title}}</span>
                 </div>
                 <div class="col-12 pt-2">
-                  <mat-progress-bar mode="determinate" value="{{tasksProgress}}"></mat-progress-bar>
+                  <mat-progress-bar mode="determinate" value="{{taskProgress}}"></mat-progress-bar>
                 </div>
                 <small class="col-12 py-1 text-muted">
                   Created on {{activeTask.createdOn | date}} / Updated on {{activeTask.lastModified | date}}
@@ -173,8 +185,9 @@
 
               <div class="row my-3">
 
-                <div class="col-12 col-md-2">
+                <div class="col-12 col-md-4 col-xl-2">
                   <div class="row">
+                    <!-- due date -->
                     <div class="col-12 col-sm-4 col-md-12 pb-2">
                       <mat-card>
                         <mat-card-content>
@@ -184,20 +197,22 @@
                             </div>
                             <div class="col-12 text-center">
                               <mat-form-field class="d-none" style="width:100%">
-                                <input matInput [matDatepicker]="picker" [(ngModel)]="activeTask.dueDate" (change)="saveTask({dueDate:activeTask.dueDate})"
-                                  placeholder="Set due date">
+                                <input matInput [matDatepicker]="picker" [(ngModel)]="activeTask.dueDate"
+                                  (ngModelChange)="saveTask({dueDate:activeTask.dueDate})" placeholder="Set due date">
                                 <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
                                 <mat-datepicker touchUi #picker></mat-datepicker>
                               </mat-form-field>
                               <span class="text-link" *ngIf="activeTask.dueDate==null" (click)="picker.open()">Set due
                                 date</span>
-                              <span *ngIf="activeTask.dueDate!==null" class="task-due-date">Due by
+                              <span *ngIf="activeTask.dueDate!==null" (click)="picker.open()" class="task-due-date">Due
+                                by
                                 {{activeTask.dueDate | date:'EEEE, MMMM d'}}</span>
                             </div>
                           </div>
                         </mat-card-content>
                       </mat-card>
                     </div>
+                    <!-- reminder -->
                     <div class="col-12 col-sm-4 col-md-12 pb-2">
                       <mat-card>
                         <mat-card-content>
@@ -215,6 +230,7 @@
                         </mat-card-content>
                       </mat-card>
                     </div>
+                    <!-- delete task -->
                     <div class="col-12 col-sm-4 col-md-12 pb-2">
                       <mat-card class="task-delete-card">
                         <mat-card-content>
@@ -223,24 +239,24 @@
                               <mat-icon *ngIf="activeTask.reminder==null">delete_outline</mat-icon>
                             </div>
                             <div class="col-12 text-center">
-                              <span class="text-link" (click)="deleteTask(activeTask.taskId)">Delete task</span>
+                              <span class="text-link" data-toggle="modal" data-target="#deleteTaskModal">Delete task</span>
                             </div>
                           </div>
                         </mat-card-content>
                       </mat-card>
                     </div>
                   </div>
-
                 </div>
 
-                <div class="col-12 col-md-5">
+                <!-- sub tasks -->
+                <div class="col-12 col-md-8 col-xl-4">
                   <div class="row">
                     <div class="col-12">
                       <mat-card>
                         <mat-card-title>
                           <div class="row subtask-card-header px-2 justify-content-between">
                             <div class="col-auto">Sub-tasks</div>
-                            <div class="col-auto">0/{{activeTask.subTask.length}}</div>
+                            <div class="col-auto">{{activeTaskCompletedSubTasks}}/{{activeTask.subTask.length}}</div>
                           </div>
                         </mat-card-title>
                         <mat-card-content>
@@ -248,13 +264,14 @@
                             <mat-list-item class="task-list-item" *ngFor="let task of activeTask.subTask">
                               <div class="row align-items-center" style="width:100%">
                                 <div class="col-auto">
-                                  <mat-checkbox [(ngModel)]="task.isDone" (change)="saveSubTask(task._id,task.isDone)" color="primary"></mat-checkbox>
+                                  <mat-checkbox [(ngModel)]="task.isDone" (change)="saveSubTask(task._id,task.isDone)"
+                                    color="primary"></mat-checkbox>
                                 </div>
                                 <div class="col pl-0">
                                   <span [style.text-decoration]="task.isDone?'line-through':'none'">{{task.title}}</span>
                                 </div>
                                 <div class="col-auto">
-                                  <mat-icon style="color:lightgrey" (click)="deleteSubTask(task._id)">close</mat-icon>
+                                  <mat-icon style="color:lightgrey;cursor: pointer;" (click)="deleteSubTask(task._id)">close</mat-icon>
                                 </div>
                               </div>
                               <mat-divider [inset]="true"></mat-divider>
@@ -287,6 +304,7 @@
                   </div>
                 </div>
 
+                <!-- task comments -->
                 <div class="col-12 col-md">
                   <mat-card class="pb-0 px-0">
                     <mat-card-title>
@@ -361,12 +379,81 @@
         <!-- end tasks list view -->
 
 
+        <!-- important tasks list view header -->
+        <div class="container list-header sticky-top" *ngIf="showImportantList">
+          <div class="row py-4 justify-content-between">
+            <div class="col-12 col-sm-auto">
+              <div class="row px-4">
+                <div class="display-4" style="font-size:2rem;font-weight:400">
+                  Important tasks
+                </div>
+              </div>
+            </div>
+            <div class="col-12 col-lg-auto py-3 py-sm-0">
+              <div class="row justify-content-end">
+                <div class="col-3 col-sm-2">
+                  <div class="row text-center p-0">
+                    <div class="col-12">
+                      <mat-icon>sort</mat-icon>
+                    </div>
+                    <small class="col-12" style="line-height:0.1rem">Sort</small>
+                  </div>
+                </div>
+                <div class="col-6 col-sm">
+                  <div class="row text-center">
+                    <small class="col-12 pb-2">
+                      {{completedImportantTasks}} of {{importantTasks.length}} tasks completed
+                    </small>
+                    <div class="col-12">
+                      <mat-progress-bar mode="determinate" value="{{importantTasksProgress}}"></mat-progress-bar>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- end important list view header -->
+
+
+        <!-- important tasks list view -->
+        <div class="container" *ngIf="importantTasks && showImportantList">
+          <div class="row" *ngIf="showImportantList">
+
+            <div class="col-12">
+              <div class="row align-items-center task-list-item" *ngFor="let task of importantTasks">
+                <div class="col-1 pt-1 text-center">
+                  <mat-checkbox style="font-size:2rem;z-index:99" [(ngModel)]="task.isDone" (change)="setTaskStatus(task)"
+                    color="primary"></mat-checkbox>
+                </div>
+                <div class="col-9 col-sm text-left" [routerLink]="['/dashboard']" [queryParams]="{taskId: task.taskId}"
+                  style="cursor:pointer">
+                  <span class="lead" [style.text-decoration]="task.isDone?'line-through':'none'">{{task.title}}</span>
+                </div>
+                <div class="col-2 d-none d-sm-flex">
+                  <small>{{task.subTask.length}} Subtasks</small>
+                </div>
+                <div class="col-2 due-date d-none d-sm-flex">
+                  <small>Due by {{task.dueDate | date}}</small>
+                </div>
+                <div class="col-1">
+                  <mat-icon class="not-imp" *ngIf="!task.isImportant" (click)="task.isImportant=true;saveTask({isImportant:true},task.taskId)">bookmark_border</mat-icon>
+                  <mat-icon class="imp" *ngIf="task.isImportant" (click)="task.isImportant=false;saveTask({isImportant:false},task.taskId)">bookmark</mat-icon>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <!-- end important tasks list view -->
+
+
         <!-- calender view -->
         <div class="container">
           <div class="row">
             <div class="col-12 calender-col">
-              <div *ngIf="calendarOptions">
-                <ng-fullcalendar #ucCalendar [options]="calendarOptions" (eventClick)="eventClick($event.detail)"
+              <div *ngIf="calendarOptions" style="height:90vh">
+                <ng-fullcalendar #ucCalendar [options]="calendarOptions" (eventClick)="eventClick($event.detail.event)"
                   (eventResize)="updateMeeting($event.detail.event)" (dayClick)="dayClick($event.detail)" (select)="select($event.detail)"
                   (eventDrop)="updateMeeting($event.detail.event)"></ng-fullcalendar>
               </div>
@@ -379,4 +466,50 @@
     </div>
 
   </div>
+
+
+  <!-- friends list -->
+  <div class="container fixed-bottom friends-list-container" *ngIf="showFriendList">
+    <div class="row pt-2 pb-3">
+      <div class="col pt-2 display-4" style="font-size:1.8rem">Share '{{activeList.title}}' with</div>
+    </div>
+    <div class="row">
+      <div class="col-auto" *ngFor="let friend of friends">
+        <div class="friend-chip" [ngClass]="{'selected-chip': selectedFriends.includes(friend.userId)}" (click)="selectedFriends.push(friend.userId)">{{friend.firstName}} {{friend.lastName}}</div>
+      </div>
+    </div>
+    <div class="row justify-content-end" style="position:absolute; bottom: 5%;right:5%">
+      <div class="col-auto">
+        <button class="px-3" mat-stroked-button color="primary" (click)="showFriendList=false">Cancel</button>
+      </div>
+      <div class="col-auto">
+        <button class="px-3" mat-flat-button color="primary" (click)="shareList();showFriendList=false">Share</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modals -->
+
+  <!-- delete task modal -->
+  <div class="modal fade" id="deleteTaskModal" tabindex="-1" role="dialog" aria-labelledby="deleteTaskModal"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalCenterTitle">Delete task</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body" *ngIf="activeTask">
+          Are you sure to delete "{{activeTask.title}}" task.
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" (click)="deleteTask(activeTask.taskId)" data-dismiss="modal">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>

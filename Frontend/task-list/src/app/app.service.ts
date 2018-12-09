@@ -115,7 +115,7 @@ export class AppService {
   }
 
   deleteTaskComment(taskId, comment): Observable<any> {
-    let response = this._http.post(`${this.baseUrl}/tasks/${taskId}/comment/delete`, comment)
+    let response = this._http.post(`${this.baseUrl}/tasks/${taskId}/commentDelete`, comment)
     return response
   }
 

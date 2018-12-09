@@ -28,11 +28,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
   public lists = [];
   public activeList: any;
   public allTasks = [];
+  public friends: any;
+  public importantTasks: any = [];
+  public completedImportantTasks: number;
+  public importantTasksProgress: number;
   public showTasksList: Boolean = true;
+  public showImportantList: Boolean = false;
+  public showFriendList: Boolean = false;
+  public selectedFriends: any = [];
   public activeListTasks = [];
   public activeListNotes: string;
   public activeListCompletedTasks: number;
-  public tasksProgress: number;
+  public listProgress: number;
+  public taskProgress: number;
+  public activeTaskCompletedSubTasks: number;
   public activeTask: any;
   public notification: any;
 
@@ -66,6 +75,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             console.log(list[0])
             this.makeListActive(list[0])
             this.showTasksList = false;
+            this.showImportantList = false;
             this.showProgressBar = false
           }, 2000)
         }, 2000)
@@ -82,13 +92,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
   makeListActive(list) {
     this.activeList = list;
     this.getActiveListTasks(list.listId);
-    this.calendarOptions = null
+    this.calendarOptions = null;
+    this.showImportantList = false
   }
 
   loadTask(task) {
-    console.log(task)
     this.showTasksList = false;
+    this.showImportantList = false;
     this.activeTask = task;
+    // getting number of subtasks marked as done
+    this.activeTaskCompletedSubTasks = this.activeTask.subTask.filter(task => task.isDone).length;
+    this.taskProgress = (this.activeTaskCompletedSubTasks / this.activeTask.subTask.length) * 100;
   }
 
   setTaskStatus(task) {
@@ -96,12 +110,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
       isDone: task.isDone
     }
     task.isDone ? this.activeListCompletedTasks++ : this.activeListCompletedTasks--;
-    this.tasksProgress = (this.activeListCompletedTasks / this.activeListTasks.length) * 100;
+    this.listProgress = (this.activeListCompletedTasks / this.activeListTasks.length) * 100;
     this.appService.editTask(task.taskId, editData).subscribe(
       response => {
-        if (response.status === 200) {
-          console.log(response)
-        } else {
+        if (response.status !== 200) {
           this.snackBar.open(response.message, 'Close', { duration: 4000 });
           console.log(response.message)
         }
@@ -164,6 +176,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.showProgressBar = false;
         if (response.status === 200) {
           this.allTasks = response.data;
+          this.importantTasks = this.allTasks.filter(task => task.isImportant);
+          this.completedImportantTasks = this.importantTasks.filter(task => task.isDone).length;
+          this.importantTasksProgress = (this.completedImportantTasks / this.importantTasks.length) * 100;
         } else {
           console.log(response.message)
         }
@@ -210,12 +225,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.activeListTasks = response.data;
           this.showProgressBar = false;
           this.activeListCompletedTasks = this.activeListTasks.filter(task => task.isDone).length;
-          this.tasksProgress = (this.activeListCompletedTasks / this.activeListTasks.length) * 100;
-          console.log(response.data)
+          this.listProgress = (this.activeListCompletedTasks / this.activeListTasks.length) * 100;
         } else {
           this.activeListTasks = null;
           this.activeListCompletedTasks = 0;
-          this.tasksProgress = 0;
+          this.listProgress = 0;
           console.log(response.message)
         }
       },
@@ -253,12 +267,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     )
   }// end createNewTask
 
-  saveTask(field) {
-    console.log('saving task', field)
-    this.appService.editTask(this.activeTask.taskId, field).subscribe(
+  saveTask(field, taskId?) {
+    this.appService.editTask(taskId ? taskId : this.activeTask.taskId, field).subscribe(
       response => {
         if (response.status === 200) {
-          console.log(response)
+          console.log(`%cTask saved!`, 'color:green;font-weight:bold')
         } else {
           this.snackBar.open(response.message, 'Close', { duration: 4000 });
           console.log(response.message)
@@ -292,12 +305,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   saveSubTask(id, status) {
-    console.log('saving', this.activeTask.taskId, id, status)
+    // getting number of subtasks marked as done
+    this.activeTaskCompletedSubTasks = this.activeTask.subTask.filter(task => task.isDone).length;
+    this.taskProgress = (this.activeTaskCompletedSubTasks / this.activeTask.subTask.length) * 100;
     this.appService.setSubTaskStatus(this.activeTask.taskId, id, status).subscribe(
       response => {
-        if (response.status === 200) {
-          console.log(response)
-        } else {
+        if (response.status !== 200) {
           this.snackBar.open(response.message, 'Close', { duration: 4000 });
           console.log(response.message)
         }
@@ -314,8 +327,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
       response => {
         if (response.status === 200) {
           this.activeTask = response.data;
+          // updating active list tasks with edited data
           this.activeListTasks = this.activeListTasks.map((e, i) => e.taskId == this.activeTask.taskId ? e = this.activeTask : e)
-          console.log(response.data)
         } else {
           this.snackBar.open(response.message, 'Close', { duration: 4000, });
           console.log(response.message)
@@ -351,6 +364,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }// end addComment
 
   deleteComment(commentId) {
+    console.log('deleting comment with _id: ', commentId)
     this.appService.deleteTaskComment(this.activeTask.taskId, { comment_id: commentId }).subscribe(
       response => {
         if (response.status === 200) {
@@ -435,22 +449,76 @@ export class DashboardComponent implements OnInit, OnDestroy {
     )
   }
 
-  loadCalender(): any {
+  getFriends() {
 
+    if (this.userDetails.friends.length !== 0) {
+      this.appService.getMultipleUsers(this.userDetails.friends).subscribe(
+        response => {
+          if (response.status === 200) {
+            this.friends = response.data;
+            this.showFriendList = true;
+          } else {
+            console.log(response.message)
+          }
+        },
+        error => {
+          console.log("some error occured. Cannot get freinds");
+          console.log(error)
+        }
+      )
+    } else {
+      this.snackBar.open('No friends. Add friends to share lists', 'Close', { duration: 4000, });
+    }
+  }// end shareList
+
+  shareList() {
+    this.appService.editList(this.activeList.listId, { collaborators: this.selectedFriends }).subscribe(
+      response => {
+        if (response.status === 200) {
+          console.log(`%cList shared!`, 'color:green;font-weight:bold');
+          this.snackBar.open(`${this.activeList.title} shared.`, 'Close', { duration: 4000, });
+        } else {
+          this.snackBar.open(response.message, 'Close', { duration: 4000, });
+          console.log(`%c${response.message}`, 'color:red;font-weight:bold');
+        }
+      },
+      error => {
+        console.log("some error occured. Couldn't share list");
+        console.log(error)
+      }
+    )
+  }
+
+  loadCalender(): any {
+    let tasks = Object.keys(this.allTasks).map(i => this.allTasks[i])
     this.calendarOptions = {
-      editable: false,
-      eventLimit: false,
       header: {
         left: 'prev,next today',
-        center: '',
-        right: 'title',
+        center: 'title',
+        right: 'month,listMonth'
       },
+      events: function (start, end, timezone, callback) {
+        let events = [];
+        // let userMeetings = this.allTasks
+        for (let task of tasks) {
+          events.push({
+            title: task.title,
+            start: task.dueDate,
+            taskId: task.taskId
+          });
+        }
+        callback(events);
+      },//end events
       timezone: 'local',
       eventTextColor: 'white',
       timeFormat: 'h(:mm)t',
       height: 'parent'
     };//end calenderOptions
 
+  }
+
+  eventClick(task) {
+    this.router.navigate(['/dashboard'], { queryParams: { taskId: task.taskId } });
   }
 
   verifyUserConfirmation: any = () => {
