@@ -95,6 +95,31 @@ button:focus{
     color: rgb(233, 23, 23)
 }
 
+
+.notification{
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    margin: 1rem;
+    padding: 0.5rem 1rem;
+    padding-bottom: 0;
+    background: rgba(0,0,0,0.75);
+    color: white;
+    z-index: 1;
+    width: 25vw;
+}
+.notification mat-icon{
+   font-size: 1.2rem;
+}
+.notification .button{
+    cursor: pointer;
+}
+.notification .button:hover{
+    background: rgba(255,255,255,0.45);
+}
+
+
+
 footer{
     margin: 0;
     background-color: whitesmoke

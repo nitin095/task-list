@@ -24,12 +24,11 @@ import {
   MatDatepickerModule,
   MatNativeDateModule
 } from '@angular/material';
-import { GoogleBtnComponent } from './google-btn/google-btn.component';
 import { FriendCardComponent } from './friend-card/friend-card.component';
 
 
 @NgModule({
-  declarations: [GoogleBtnComponent, FriendCardComponent],
+  declarations: [FriendCardComponent],
   imports: [
     CommonModule,
     MatButtonModule,
@@ -42,7 +41,6 @@ import { FriendCardComponent } from './friend-card/friend-card.component';
   ],
   exports: [
     CommonModule,
-    GoogleBtnComponent,
     FriendCardComponent,
     MatButtonModule,
     MatCheckboxModule,

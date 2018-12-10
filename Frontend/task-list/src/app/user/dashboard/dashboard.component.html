@@ -34,7 +34,8 @@
         <!-- drawer -->
         <mat-drawer #drawer [mode]="mobileQuery.matches ? 'over' : 'side'" opened="true">
           <div class="vh10"></div>
-          <div class="vh10" style="justify-content: flex-start" (click)="activeList=null;showTodayList=true;showImportantList=false;calendarOptions=null;isActive.value='day'" [ngClass]="{'active-bg': isActive.value=='day'}">
+          <div class="vh10" style="justify-content: flex-start" (click)="activeList=null;showTodayList=true;showImportantList=false;calendarOptions=null;isActive.value='day'"
+            [ngClass]="{'active-bg': isActive.value=='day'}">
             <span>Today</span>
           </div>
           <div class="vh10 no-focus" style="justify-content: flex-start" (click)="activeList=null;showTodayList=false;showImportantList=true;calendarOptions = null;isActive.value='imp'"
@@ -134,11 +135,11 @@
                 <div class="col-9 col-sm text-left" (click)="loadTask(task)" style="cursor:pointer">
                   <span class="lead" [style.text-decoration]="task.isDone?'line-through':'none'">{{task.title}}</span>
                 </div>
+                <div *ngIf="task.dueDate" class="col-2 due-date d-none d-sm-flex">
+                  <small>Due by {{task.dueDate | date}}</small>
+                </div>
                 <div class="col-2 d-none d-sm-flex">
                   <small>{{task.subTask.length}} Subtasks</small>
-                </div>
-                <div class="col-2 due-date d-none d-sm-flex">
-                  <small>Due by {{task.dueDate | date}}</small>
                 </div>
                 <div class="col-1">
                   <mat-icon class="not-imp" *ngIf="!task.isImportant" (click)="task.isImportant=true;markTaskImportant(task)">bookmark_border</mat-icon>
@@ -449,63 +450,63 @@
         <!-- end important tasks list view -->
 
 
-           <!-- today tasks list view header -->
-           <div class="container list-header sticky-top" *ngIf="showTodayList">
-              <div class="row py-4 justify-content-between">
-                <div class="col-12 col-sm-auto">
-                  <div class="row px-4">
-                    <div class="display-4" style="font-size:2rem;font-weight:400">
-                      Today
-                    </div>
-                  </div>
-                </div>
-                <div class="col-12 col-lg-auto py-3 py-sm-0">
-                  <div class="row justify-content-end">
-                    <div class="col-3 col-sm-2 col-lg-auto">
-                      <div class="row text-center p-0">
-                        <div class="col-12">
-                          <mat-icon>sort</mat-icon>
-                        </div>
-                        <small class="col-12" style="line-height:0.1rem">Sort</small>
-                      </div>
-                    </div>
-                  </div>
+        <!-- today tasks list view header -->
+        <div class="container list-header sticky-top" *ngIf="showTodayList">
+          <div class="row py-4 justify-content-between">
+            <div class="col-12 col-sm-auto">
+              <div class="row px-4">
+                <div class="display-4" style="font-size:2rem;font-weight:400">
+                  Today
                 </div>
               </div>
             </div>
-            <!-- end important list view header -->
-
-
-             <!-- today tasks list view -->
-        <div class="container" *ngIf="todayTasks && showTodayList">
-            <div class="row" *ngIf="showTodayList">
-  
-              <div class="col-12">
-                <div class="row align-items-center task-list-item" *ngFor="let task of todayTasks">
-                  <div class="col-1 pt-1 text-center">
-                    <mat-checkbox style="font-size:2rem;z-index:99" [(ngModel)]="task.isDone" (change)="setTaskStatus(task)"
-                      color="primary"></mat-checkbox>
-                  </div>
-                  <div class="col-9 col-sm text-left" [routerLink]="['/dashboard']" [queryParams]="{taskId: task.taskId}"
-                    style="cursor:pointer">
-                    <span class="lead" [style.text-decoration]="task.isDone?'line-through':'none'">{{task.title}}</span>
-                  </div>
-                  <div class="col-2 d-none d-sm-flex">
-                    <small>{{task.subTask.length}} Subtasks</small>
-                  </div>
-                  <div class="col-2 due-date d-none d-sm-flex">
-                    <small>Due by {{task.dueDate | date}}</small>
-                  </div>
-                  <div class="col-1">
-                    <mat-icon class="not-imp" *ngIf="!task.isImportant" (click)="task.isImportant=true;saveTask({isImportant:true},task.taskId)">bookmark_border</mat-icon>
-                    <mat-icon class="imp" *ngIf="task.isImportant" (click)="task.isImportant=false;saveTask({isImportant:false},task.taskId)">bookmark</mat-icon>
+            <div class="col-12 col-lg-auto py-3 py-sm-0">
+              <div class="row justify-content-end">
+                <div class="col-3 col-sm-2 col-lg-auto">
+                  <div class="row text-center p-0">
+                    <div class="col-12">
+                      <mat-icon>sort</mat-icon>
+                    </div>
+                    <small class="col-12" style="line-height:0.1rem">Sort</small>
                   </div>
                 </div>
               </div>
-  
             </div>
           </div>
-          <!-- end important tasks list view -->
+        </div>
+        <!-- end important list view header -->
+
+
+        <!-- today tasks list view -->
+        <div class="container" *ngIf="todayTasks && showTodayList">
+          <div class="row" *ngIf="showTodayList">
+
+            <div class="col-12">
+              <div class="row align-items-center task-list-item" *ngFor="let task of todayTasks">
+                <div class="col-1 pt-1 text-center">
+                  <mat-checkbox style="font-size:2rem;z-index:99" [(ngModel)]="task.isDone" (change)="setTaskStatus(task)"
+                    color="primary"></mat-checkbox>
+                </div>
+                <div class="col-9 col-sm text-left" [routerLink]="['/dashboard']" [queryParams]="{taskId: task.taskId}"
+                  style="cursor:pointer">
+                  <span class="lead" [style.text-decoration]="task.isDone?'line-through':'none'">{{task.title}}</span>
+                </div>
+                <div class="col-2 d-none d-sm-flex">
+                  <small>{{task.subTask.length}} Subtasks</small>
+                </div>
+                <div class="col-2 due-date d-none d-sm-flex">
+                  <small>Due by {{task.dueDate | date}}</small>
+                </div>
+                <div class="col-1">
+                  <mat-icon class="not-imp" *ngIf="!task.isImportant" (click)="task.isImportant=true;saveTask({isImportant:true},task.taskId)">bookmark_border</mat-icon>
+                  <mat-icon class="imp" *ngIf="task.isImportant" (click)="task.isImportant=false;saveTask({isImportant:false},task.taskId)">bookmark</mat-icon>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        <!-- end important tasks list view -->
 
 
 

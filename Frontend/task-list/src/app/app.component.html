@@ -74,10 +74,33 @@
       </button>
     </mat-menu>
   </mat-toolbar>
-
 </nav>
 
+
 <router-outlet></router-outlet>
+
+
+<!-- notification -->
+<div class="notification" *ngIf="notification && notification.display == true">
+  <div class="row align-items-center justify-content-center">
+    <div class="col-12 heading">{{notification.event}}</div>
+    <div class="col-12 lead">{{notification.message}}</div>
+    <!-- <small class="col-12 pb-3">{{notification.time}}</small> -->
+    <div matRipple class="col-6 button py-2" (click)="notification = undefined">
+      <div class="row text-center justify-content-center">
+        <mat-icon class="col-12">cancel</mat-icon>
+        <small class="col-12">Dismiss</small>
+      </div>
+    </div>
+    <div matRipple *ngIf="notification.type == 'request'" class="col-6 button py-2" [routerLink]="['/friends']" (click)="notification = undefined">
+      <div class="row text-center">
+        <mat-icon class="col-12">info</mat-icon>
+        <small class="col-12">View</small>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- end notification -->
 
 
 <!-- footer -->

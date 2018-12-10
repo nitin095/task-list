@@ -14,12 +14,12 @@ import { ProfileComponent } from './profile/profile.component';
 @NgModule({
   declarations: [LoginComponent, DashboardComponent, FriendsComponent, ProfileComponent],
   imports: [
+    UserRoutingModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     FullCalendarModule,
-    SharedModule,
-    UserRoutingModule
+    SharedModule
   ]
 })
 export class UserModule { }

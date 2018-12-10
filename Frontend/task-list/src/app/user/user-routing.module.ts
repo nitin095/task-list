@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-
 import { LoginComponent } from './login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { FriendsComponent } from './friends/friends.component';
@@ -13,6 +12,7 @@ const userRoutes: Routes = [
   { path: 'profile', component: ProfileComponent }
 ];
 
+
 @NgModule({
   imports: [
     RouterModule.forChild(userRoutes)
@@ -21,4 +21,5 @@ const userRoutes: Routes = [
     RouterModule
   ]
 })
+
 export class UserRoutingModule { }

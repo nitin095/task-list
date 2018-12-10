@@ -11,7 +11,7 @@
   </div>
 
   <div class="row my-3" *ngIf="friends">
-    <div class="col-6 col-md-3" *ngFor="let friend of friends">
+    <div class="col-6 col-md-4 col-lg-3" *ngFor="let friend of friends">
       <friend-card [firstName]='friend.firstName' [lastName]="friend.lastName" [email]="friend.email" [countryCode]="friend.countryCode"
         [mobileNumber]="friend.mobileNumber" [cardType]="'friend'" (removeFriend)="removeFriend(friend.userId)"></friend-card>
     </div>
@@ -39,7 +39,7 @@
       <mat-divider></mat-divider>
     
       <div class="row my-3" *ngIf="friendRequestsSent">
-        <div class="col-3" *ngFor="let friend of friendRequestsSent">
+        <div class="col-6 col-md-4 col-lg-3" *ngFor="let friend of friendRequestsSent">
           <friend-card [firstName]='friend.firstName' [lastName]="friend.lastName" [email]="friend.email" [countryCode]="friend.countryCode"
             [mobileNumber]="friend.mobileNumber" [cardType]="'friendRequestSent'" (friendRequest)="handleFriendRequest($event,friend.userId)"></friend-card>
         </div>
@@ -63,7 +63,7 @@
   </div>
 
   <div class="row my-3" *ngIf="searchResults">
-    <div class="col-3" *ngFor="let friend of searchResults">
+    <div class="col-6 col-md-4 col-lg-3" *ngFor="let friend of searchResults">
       <friend-card [firstName]='friend.firstName' [lastName]="friend.lastName" [email]="friend.email" [countryCode]="friend.countryCode"
         [mobileNumber]="friend.mobileNumber" [cardType]="'nonFriend'" (addFriend)="addFriend(friend.userId)"></friend-card>
     </div>

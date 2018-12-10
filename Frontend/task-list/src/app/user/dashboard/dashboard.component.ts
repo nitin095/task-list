@@ -4,7 +4,6 @@ import { ActivatedRoute, Router } from "@angular/router";
 import { AppService } from './../../app.service'
 import { Observable } from 'rxjs';
 import { MatSnackBar } from '@angular/material';
-import { SocketService } from './../../socket.service';
 import { Cookie } from 'ng2-cookies/ng2-cookies';
 
 //importing ng-fullCalender 
@@ -16,14 +15,13 @@ import { Options } from 'fullcalendar';
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
-  providers: [Location, SocketService]
+  // providers: [Location]
 })
 
 export class DashboardComponent implements OnInit, OnDestroy {
 
   mobileQuery: MediaQueryList;
   showProgressBar = true;
-  public authToken: any;
   public userDetails = this.appService.getUserInfoFromLocalstorage();
   public lists = [];
   public activeList: any;
@@ -45,14 +43,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
   public taskProgress: number;
   public activeTaskCompletedSubTasks: number;
   public activeTask: any;
-  public notification: any;
+ 
 
   private _mobileQueryListener: () => void;
 
   calendarOptions: Options;
   @ViewChild(CalendarComponent) ucCalendar: CalendarComponent;
 
-  constructor(private _route: ActivatedRoute, private router: Router, private appService: AppService, public snackBar: MatSnackBar, public SocketService: SocketService, changeDetectorRef: ChangeDetectorRef, media: MediaMatcher) {
+  constructor(private _route: ActivatedRoute, private router: Router, private appService: AppService, public snackBar: MatSnackBar, changeDetectorRef: ChangeDetectorRef, media: MediaMatcher) {
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
     this._mobileQueryListener = () => changeDetectorRef.detectChanges();
     this.mobileQuery.addListener(this._mobileQueryListener);
@@ -62,9 +60,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     this.getAllLists(true);
     this.getAllTasks();
-    this.authToken = Cookie.get('authtoken');
-    this.verifyUserConfirmation();
-    this.getNotifications();
 
     this._route.queryParams.subscribe(params => {
       if (params['taskId']) {
@@ -541,23 +536,5 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.router.navigate(['/dashboard'], { queryParams: { taskId: task.taskId } });
   }
 
-  verifyUserConfirmation: any = () => {
-    this.SocketService.verifyUser()
-      .subscribe((data) => {
-        this.SocketService.setUser(this.authToken);
-      });
-  }
-
-  getNotifications(): any {
-    this.SocketService.notification().subscribe((data) => {
-      console.log('NOTIFICATION RECEIVED FROM SERVER!')
-      console.log(data);
-      this.notification = { event: data.event, friendId: data.friendId, userName: data.userName, display: true }
-      if (data.event === 'Friend request received') {
-        this.userDetails.friendRequests.push(data.friendId)
-        this.appService.setUserInfoInLocalStorage(this.userDetails)
-      }
-    });
-  }//end getAlerts
-
+  
 }// end DashboardComponent class

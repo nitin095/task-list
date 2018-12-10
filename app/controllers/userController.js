@@ -495,10 +495,12 @@ let addFriend = (req, res) => {
 
             //sending notification to friend request receiver
             let notification = {
+                type: 'request',
                 event: 'Friend request received',
                 friendId: req.params.userId,
                 receiverId: [req.body.friendId],
-                userName: `${userDetails.firstName} ${userDetails.lastName}`,
+                friendName: `${userDetails.firstName} ${userDetails.lastName}`,
+                time: Date.now()
             }
             socketLib.sendNotification(notification)
         })
@@ -592,10 +594,12 @@ let acceptFriendRequest = (req, res) => {
 
             //sending notification to friend request sender
             let notification = {
+                type: 'request',
                 event: 'Friend request accepted',
                 receiverId: [req.body.friendId],
                 friendId: req.params.userId,
                 friendName: `${userDetails.firstName} ${userDetails.lastName}`,
+                time: Date.now()
             }
             socketLib.sendNotification(notification)
         })
@@ -769,10 +773,12 @@ let ignoreReceivedRequest = (req, res) => {
 
             //sending notification to friend request sender
             let notification = {
+                type: 'request',
                 event: 'Friend request declined',
                 receiverId: [req.body.friendId],
                 friendId: req.params.userId,
                 friendName: `${userDetails.firstName} ${userDetails.lastName}`,
+                time: Date.now()
             }
             socketLib.sendNotification(notification)
         })
@@ -859,10 +865,12 @@ let removeFriend = (req, res) => {
             res.send(apiResponse)
             //sending notification to removed friend
             let notification = {
+                type: 'request',
                 event: 'Friend removed',
                 receiverId: [req.body.friendId],
                 friendId: req.params.userId,
                 friendName: `${userDetails.firstName} ${userDetails.lastName}`,
+                time: Date.now()
             }
             socketLib.sendNotification(notification)
         })

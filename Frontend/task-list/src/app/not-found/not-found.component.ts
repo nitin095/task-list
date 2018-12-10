@@ -5,7 +5,7 @@ import { Location } from '@angular/common';
   selector: 'app-not-found',
   templateUrl: './not-found.component.html',
   styleUrls: ['./not-found.component.css'],
-  providers: [Location]
+  // providers: [Location]
 })
 export class NotFoundComponent implements OnInit {
 

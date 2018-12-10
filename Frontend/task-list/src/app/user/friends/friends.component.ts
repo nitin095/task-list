@@ -2,17 +2,20 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from "@angular/router";
 import { Cookie } from 'ng2-cookies/ng2-cookies';
 import { AppService } from './../../app.service';
+import { SocketService } from './../../socket.service';
 import { MatSnackBar, MatRipple } from '@angular/material';
 
 @Component({
   selector: 'app-friends',
   templateUrl: './friends.component.html',
-  styleUrls: ['./friends.component.css']
+  styleUrls: ['./friends.component.css'],
+  // providers: [Location, SocketService]
 })
 export class FriendsComponent implements OnInit {
 
   @ViewChild(MatRipple) ripple: MatRipple;
 
+  notification: any;
   showNoFriends: Boolean = false;
   public userDetails = this.appService.getUserInfoFromLocalstorage();
   public friends: any = [];
@@ -20,9 +23,10 @@ export class FriendsComponent implements OnInit {
   public friendRequestsSent: any = [];
   public searchResults: any = [];
 
-  constructor(private _route: ActivatedRoute, private router: Router, private appService: AppService, public snackBar: MatSnackBar) { }
+  constructor(private _route: ActivatedRoute, private router: Router, private appService: AppService, public SocketService: SocketService, public snackBar: MatSnackBar) { }
 
   ngOnInit() {
+    this.getNotifications();
     this.getAllFriends();
     if (this.userDetails.friendRequests) this.getFriendRequests()
     if (this.userDetails.friendRequestsSent) this.getFriendRequestsSent()
@@ -216,5 +220,25 @@ export class FriendsComponent implements OnInit {
     }
 
   }// end handleFriendRequest
+
+  getNotifications(): any {
+
+    this.SocketService.notification().subscribe((data) => {
+
+      this.notification = { type: data.type, event: data.event, message: '', friendId: data.friendId, friendName: data.friendName, time: data.time, display: true }
+
+      if (data.event === 'Friend request received') {
+        this.getFriendRequests()
+      } else if (data.event == 'Friend request accepted') {
+        this.getAllFriends();
+        this.getFriendRequestsSent();
+      } else if (data.event == 'Friend request declined') {
+        this.getFriendRequestsSent()
+      } else if (data.event == 'Friend removed') {
+        this.getAllFriends()
+      }
+
+    });
+  }
 
 }
