@@ -3,38 +3,47 @@ const router = express.Router();
 const listController = require("./../../app/controllers/listController");
 const appConfig = require("./../../config/appConfig")
 const auth = require('./../middlewares/auth')
-const googleAuth = require("./../libs/googleAuth")
 
 module.exports.setRouter = (app) => {
 
-    let baseUrl = `${appConfig.apiVersion}/lists`;
+	let baseUrl = `${appConfig.apiVersion}/lists`;
 
-    // defining routes.
+	// defining routes.
 
-    app.get(`${baseUrl}/all/:userId`, listController.getAllLists);
+	app.get(`${baseUrl}/all/:userId`, auth.isAuthorized, listController.getAllLists);
 
     /**
-	 * @api {get} /api/v1/lists/view/all Get all lists
+	 * @api {get} /api/v1/lists/view/:userId Get all lists created by the user
 	 * @apiVersion 0.0.1
 	 * @apiGroup read
 	 *
 	 * @apiParam {String} authToken The token for authentication.(Send authToken as query parameter, body parameter or as a header)
+	 * @apiParam {String} title title of the list passed as the Body parameter
+	 * @apiParam {String} notes notes of the list passed as the Body parameter
+	 * @apiParam {String} collaborators user ids of the list collaborators passed as the Body parameter
+	 * @apiParam {String} isDone done status of the list passed as the Body parameter
+	 * @apiParam {String} tasks tasks ids of the list passed as the Body parameter
 	 *
 	 *  @apiSuccessExample {json} Success-Response:
 	 *  {
 	    "error": false,
-	    "message": "All List Details Found",
+	    "message": "List edited",
 	    "status": 200,
 	    "data": [
-					{
-						listId: "string",
-						firstName: "string",
-						lastName: "string",
-                        email: "string",
-                        countryCode: number,
-						moile: number,
-						lastModified: "date"
-					}
+				 	{
+						"tasks": [
+							"taskId1",
+							"taskId2"
+						],
+						"notes": "String",
+						"collaborators": [Array<string>],
+						"isDone": Boolean,
+						"listId": "String",
+						"createdBy": "String",
+						"title": "String",
+						"createdOn": "Date",
+						"lastModified": "Date"
+        			}
 	    		]
 	    }
 	  @apiErrorExample {json} Error-Response:
@@ -48,7 +57,7 @@ module.exports.setRouter = (app) => {
 	 */
 
 
-    app.get(`${baseUrl}/:listId/details`, listController.getSingleList);
+	app.get(`${baseUrl}/:listId/details`, listController.getSingleList);
 
     /**
 	 * @api {get} /api/v1/lists/:listId/details Get a single list
@@ -64,14 +73,19 @@ module.exports.setRouter = (app) => {
 	    "message": "List Found Successfully.",
 	    "status": 200,
 	    "data": {
-            listId: "string",
-            firstName: "string",
-            lastName: "string",
-            email: "mstring",
-            countryCode: number,
-            mobileNumber: number,
-            createdOn: "Date",
-				}
+					"tasks": [
+						"taskId1",
+						"taskId2"
+					],
+					"notes": "String",
+					"collaborators": [Array<string>],
+					"isDone": Boolean,
+					"listId": "String",
+					"createdBy": "String",
+					"title": "String",
+					"createdOn": "Date",
+					"lastModified": "Date"
+        		}
 	    }
 	  @apiErrorExample {json} Error-Response:
 	 *
@@ -84,7 +98,7 @@ module.exports.setRouter = (app) => {
 	 */
 
 
-    app.post(`${baseUrl}/create`, listController.createList);
+	app.post(`${baseUrl}/create`, listController.createList);
 
     /**
 	 * @api {post} /api/v1/lists/create Create new list
@@ -94,12 +108,11 @@ module.exports.setRouter = (app) => {
 	 * @apiParam {String} authToken The token for authentication.(Send authToken as query parameter, body parameter or as a header)
 	 * @apiParam {String} createdBy userId of the creator passed as the body parameter
      * @apiParam {String} title Title of the list passed as the body parameter
-     * @apiParam {Number} notes Notes of the list passed as the body parameter
 	 *
 	 *  @apiSuccessExample {json} Success-Response:
 	 *  {
 	    "error": false,
-	    "message": "List Deleted Successfully",
+	    "message": "List created Successfully",
 	    "status": 200,
 	    "data": []
 	    	}
@@ -117,15 +130,15 @@ module.exports.setRouter = (app) => {
 
 
 
-    app.put(`${baseUrl}/:listId/edit`, listController.editList);
+	app.put(`${baseUrl}/:listId/edit`, listController.editList);
 
     /**
-	 * @api {put} /api/v1/blogs/:listId/edit Edit list by listId
+	 * @api {put} /api/v1/lists/:listId/edit Edit list by listId
 	 * @apiVersion 0.0.1
 	 * @apiGroup edit
 	 *
 	 * @apiParam {String} authToken The token for authentication.(Send authToken as query parameter, body parameter or as a header)
-	 * @apiParam {String} listId listId of the list passed as the URL parameter
+	 * @apiParam {String} title title of the list passed as the Body parameter
 	 *
 	 *  @apiSuccessExample {json} Success-Response:
 	 *  {
@@ -133,15 +146,19 @@ module.exports.setRouter = (app) => {
 	    "message": "List Edited Successfully.",
 	    "status": 200,
 	    "data": [
-					{
-						listId: "string",
-						firstName: "string",
-						lastName: "string",
-                        email: "string",
-                        countryCode: number,
-						moile: number,
-						lastModified: "date"
-					}
+					"tasks": [
+						"taskId1",
+						"taskId2",
+						...
+					],
+					"notes": "String",
+					"collaborators": [Array<string>],
+					"isDone": Boolean,
+					"listId": "String",
+					"createdBy": "String",
+					"title": "String",
+					"createdOn": "Date",
+					"lastModified": "Date"
 	    		]
 		}
 	  @apiErrorExample {json} Error-Response:
@@ -155,7 +172,7 @@ module.exports.setRouter = (app) => {
 	 */
 
 
-    app.post(`${baseUrl}/:listId/delete`, listController.deleteList);
+	app.post(`${baseUrl}/:listId/delete`, listController.deleteList);
 
     /**
 	 * @api {post} /api/v1/lists/delete Delete list by listId

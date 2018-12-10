@@ -3,7 +3,6 @@ const router = express.Router();
 const userController = require("./../../app/controllers/userController");
 const appConfig = require("./../../config/appConfig")
 const auth = require('./../middlewares/auth')
-const googleAuth = require("./../libs/googleAuth")
 
 module.exports.setRouter = (app) => {
 
@@ -11,10 +10,7 @@ module.exports.setRouter = (app) => {
 
     // defining routes.
 
-
-    app.post(`${baseUrl}/google-auth`, googleAuth.auth)
-
-    app.get(`${baseUrl}/view/:users`, userController.getUsers);
+    app.get(`${baseUrl}/view/:users`, auth.isAuthorized, userController.getUsers);
 
     /**
 	 * @api {get} /api/v1/users/view/all Get all users
@@ -22,6 +18,7 @@ module.exports.setRouter = (app) => {
 	 * @apiGroup read
 	 *
 	 * @apiParam {String} authToken The token for authentication.(Send authToken as query parameter, body parameter or as a header)
+	 * @apiParam {String} users user ids of all users passed as url parameter
 	 *
 	 *  @apiSuccessExample {json} Success-Response:
 	 *  {
@@ -87,29 +84,28 @@ module.exports.setRouter = (app) => {
 	 */
 	
 
-	app.get(`${baseUrl}/friends`, userController.searchFriends);
+	app.get(`${baseUrl}/friends`, auth.isAuthorized, userController.searchFriends);
 
     /**
-	 * @api {get} /api/v1/users/:userId/friends Get all friends of user
+	 * @api {get} /api/v1/users//friends?search=search Search friends by name, email or mobile number
 	 * @apiVersion 0.0.1
 	 * @apiGroup read
 	 *
 	 * @apiParam {String} authToken The token for authentication.(Send authToken as query parameter, body parameter or as a header)
-	 * @apiParam {String} userId The userId should be passed as the URL parameter
+	 * @apiParam {String} search search string should be passed as the query parameter
 	 *
 	 *  @apiSuccessExample {json} Success-Response:
 	 *  {
 	    "error": false,
-	    "message": "User Found Successfully.",
+	    "message": "Users Found.",
 	    "status": 200,
 	    "data": {
-            userId: "string",
-            firstName: "string",
-            lastName: "string",
-            email: "mstring",
-            countryCode: number,
-            mobileNumber: number,
-            createdOn: "Date",
+					userId: "string",
+					firstName: "string",
+					lastName: "string",
+					email: "mstring",
+					countryCode: number,
+					mobileNumber: number,
 				}
 	    }
 	  @apiErrorExample {json} Error-Response:
@@ -122,24 +118,20 @@ module.exports.setRouter = (app) => {
 	   }
 	 */
 
-	app.post(`${baseUrl}/:userId/friends/add`, userController.addFriend);
+	app.post(`${baseUrl}/:userId/friends/add`, auth.isAuthorized, userController.addFriend);
 
     /**
-	 * @api {post} /api/v1/users/:userId/friends/add Add friend in user's friend list
+	 * @api {post} /api/v1/users/:userId/friends/add Send friend request to another user
 	 * @apiVersion 0.0.1
 	 * @apiGroup create
 	 *
-     * @apiParam {String} firstName First name of the user passed as the body parameter
-     * @apiParam {String} lastName LastName of the user passed as the body parameter
-     * @apiParam {Number} countryCode Country code of the user passed as the body parameter
-     * @apiParam {Number} mobileNumber Mobile number of the user passed as the body parameter
-     * @apiParam {String} email Email of the user passed as the body parameter
-     * @apiParam {String} password Password of the user passed as the body parameter
+     * @apiParam {String} userId userId of the user passed as the URL parameter
+     * @apiParam {String} friendId userId of the friend passed as the body parameter
 	 *
 	 *  @apiSuccessExample {json} Success-Response:
 	 *  {
 	    "error": false,
-	    "message": "User Created Successfully",
+	    "message": "Friend request sent",
 	    "status": 200,
 	    "data": []
 	    	}
@@ -155,24 +147,20 @@ module.exports.setRouter = (app) => {
 	   }
 	 */
 
-	app.put(`${baseUrl}/:userId/friends/remove`, userController.removeFriend);
+	app.put(`${baseUrl}/:userId/friends/remove`, auth.isAuthorized, userController.removeFriend);
 
     /**
-	 * @api {put} /api/v1/users/:userId/friends/add Add friend in user's friend list
+	 * @api {put} /api/v1/users/:userId/friends/remove Remove friend from user's friend list
 	 * @apiVersion 0.0.1
 	 * @apiGroup create
 	 *
-     * @apiParam {String} firstName First name of the user passed as the body parameter
-     * @apiParam {String} lastName LastName of the user passed as the body parameter
-     * @apiParam {Number} countryCode Country code of the user passed as the body parameter
-     * @apiParam {Number} mobileNumber Mobile number of the user passed as the body parameter
-     * @apiParam {String} email Email of the user passed as the body parameter
-     * @apiParam {String} password Password of the user passed as the body parameter
+     * @apiParam {String} userId userId of the user passed as the URL parameter
+     * @apiParam {String} friendId userId of the friend passed as the body parameter
 	 *
 	 *  @apiSuccessExample {json} Success-Response:
 	 *  {
 	    "error": false,
-	    "message": "User Created Successfully",
+	    "message": "Friend removed",
 	    "status": 200,
 	    "data": []
 	    	}
@@ -188,24 +176,20 @@ module.exports.setRouter = (app) => {
 	   }
 	 */
 
-	app.put(`${baseUrl}/:userId/friends/accept`, userController.acceptFriendRequest);
+	app.put(`${baseUrl}/:userId/friends/accept`, auth.isAuthorized, userController.acceptFriendRequest);
 
     /**
-	 * @api {post} /api/v1/users/:userId/friends/add Add friend in user's friend list
+	 * @api {post} /api/v1/users/:userId/friends/accept Accept friend reuqst and add friend in user's friend list
 	 * @apiVersion 0.0.1
-	 * @apiGroup create
+	 * @apiGroup update
 	 *
-     * @apiParam {String} firstName First name of the user passed as the body parameter
-     * @apiParam {String} lastName LastName of the user passed as the body parameter
-     * @apiParam {Number} countryCode Country code of the user passed as the body parameter
-     * @apiParam {Number} mobileNumber Mobile number of the user passed as the body parameter
-     * @apiParam {String} email Email of the user passed as the body parameter
-     * @apiParam {String} password Password of the user passed as the body parameter
+     * @apiParam {String} userId userId of the user passed as the URL parameter
+     * @apiParam {String} friendId userId of the friend passed as the body parameter
 	 *
 	 *  @apiSuccessExample {json} Success-Response:
 	 *  {
 	    "error": false,
-	    "message": "User Created Successfully",
+	    "message": "Friend request accepted",
 	    "status": 200,
 	    "data": []
 	    	}
@@ -222,19 +206,15 @@ module.exports.setRouter = (app) => {
 	 */
 
 
-	app.put(`${baseUrl}/:userId/friends/cancel`, userController.cancelSentRequest);
+	app.put(`${baseUrl}/:userId/friends/cancel`, auth.isAuthorized, userController.cancelSentRequest);
 
     /**
-	 * @api {post} /api/v1/users/:userId/friends/add Add friend in user's friend list
+	 * @api {put} /api/v1/users/:userId/friends/cancel Cancel sent friend request
 	 * @apiVersion 0.0.1
-	 * @apiGroup create
+	 * @apiGroup update
 	 *
-     * @apiParam {String} firstName First name of the user passed as the body parameter
-     * @apiParam {String} lastName LastName of the user passed as the body parameter
-     * @apiParam {Number} countryCode Country code of the user passed as the body parameter
-     * @apiParam {Number} mobileNumber Mobile number of the user passed as the body parameter
-     * @apiParam {String} email Email of the user passed as the body parameter
-     * @apiParam {String} password Password of the user passed as the body parameter
+     * @apiParam {String} userId userId of the user passed as the URL parameter
+     * @apiParam {String} friendId userId of the friend passed as the body parameter
 	 *
 	 *  @apiSuccessExample {json} Success-Response:
 	 *  {
@@ -256,24 +236,20 @@ module.exports.setRouter = (app) => {
 	 */
 
 
-	app.put(`${baseUrl}/:userId/friends/ignore`, userController.ignoreReceivedRequest);
+	app.put(`${baseUrl}/:userId/friends/ignore`, auth.isAuthorized, userController.ignoreReceivedRequest);
 
     /**
-	 * @api {post} /api/v1/users/:userId/friends/ignore Add friend in user's friend list
+	 * @api {put} /api/v1/users/:userId/friends/ignore Decline received friend request
 	 * @apiVersion 0.0.1
-	 * @apiGroup create
+	 * @apiGroup update
 	 *
-     * @apiParam {String} firstName First name of the user passed as the body parameter
-     * @apiParam {String} lastName LastName of the user passed as the body parameter
-     * @apiParam {Number} countryCode Country code of the user passed as the body parameter
-     * @apiParam {Number} mobileNumber Mobile number of the user passed as the body parameter
-     * @apiParam {String} email Email of the user passed as the body parameter
-     * @apiParam {String} password Password of the user passed as the body parameter
+      * @apiParam {String} userId userId of the user passed as the URL parameter
+     * @apiParam {String} friendId userId of the friend passed as the body parameter
 	 *
 	 *  @apiSuccessExample {json} Success-Response:
 	 *  {
 	    "error": false,
-	    "message": "User Created Successfully",
+	    "message": "Friend request ignored",
 	    "status": 200,
 	    "data": []
 	    	}
@@ -360,7 +336,7 @@ module.exports.setRouter = (app) => {
     app.put(`${baseUrl}/:userId/edit`, auth.isAuthorized, userController.editUser);
 
     /**
-	 * @api {put} /api/v1/blogs/:userId/edit Edit user by userId
+	 * @api {put} /api/v1/users/:userId/edit Edit user by userId
 	 * @apiVersion 0.0.1
 	 * @apiGroup edit
 	 *
@@ -457,7 +433,7 @@ module.exports.setRouter = (app) => {
 	 */
 
 
-    app.post(`${baseUrl}/:userId/delete`, userController.deleteUser);
+    app.post(`${baseUrl}/:userId/delete`, auth.isAuthorized, userController.deleteUser);
 
     /**
 	 * @api {post} /api/v1/users/delete Delete user by userId
@@ -486,8 +462,6 @@ module.exports.setRouter = (app) => {
 	   }
 	 */
 
-
-    app.get(`${baseUrl}/auths`, userController.getAllAuths);
 
     app.post(`${baseUrl}/logout`, auth.isAuthorized, userController.logout);
 
