@@ -30,10 +30,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   public allTasks = [];
   public friends: any;
   public importantTasks: any = [];
+  public todayTasks: any = [];
   public completedImportantTasks: number;
   public importantTasksProgress: number;
   public showTasksList: Boolean = true;
   public showImportantList: Boolean = false;
+  public showTodayList: Boolean = false;
   public showFriendList: Boolean = false;
   public selectedFriends: any = [];
   public activeListTasks = [];
@@ -93,7 +95,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.activeList = list;
     this.getActiveListTasks(list.listId);
     this.calendarOptions = null;
-    this.showImportantList = false
+    this.showImportantList = false;
+    this.showTodayList = false;
   }
 
   loadTask(task) {
@@ -176,6 +179,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         this.showProgressBar = false;
         if (response.status === 200) {
           this.allTasks = response.data;
+          this.allTasks.map(task => task.today = false);
           this.importantTasks = this.allTasks.filter(task => task.isImportant);
           this.completedImportantTasks = this.importantTasks.filter(task => task.isDone).length;
           this.importantTasksProgress = (this.completedImportantTasks / this.importantTasks.length) * 100;
@@ -283,6 +287,22 @@ export class DashboardComponent implements OnInit, OnDestroy {
       }
     )
   }// end saveTask
+
+  markTaskImportant(task) {
+    this.importantTasks.push(task);
+    this.saveTask({ isImportant: true }, task.taskId)
+  }
+
+  markTaskUnimportant(task) {
+    this.importantTasks = this.importantTasks.filter(x => x.taskId !== task.taskId);
+    this.saveTask({ isImportant: false }, task.taskId)
+  }
+
+  toggleMarkTaskToday(task) {
+
+    this.todayTasks.includes(task) ? this.todayTasks.splice(this.todayTasks.indexOf(task), 1) : this.todayTasks.push(task)
+    console.log(this.todayTasks)
+  }
 
   deleteTask(taskId) {
     this.appService.deleteTask(taskId).subscribe(

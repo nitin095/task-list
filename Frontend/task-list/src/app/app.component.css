@@ -96,5 +96,18 @@ button:focus{
 }
 
 footer{
-    background-color: #edeffa;
+    margin: 0;
+    background-color: whitesmoke
+}
+
+.footer-link{
+    text-decoration: none;
+    color: #197bd8
+}
+.footer-link:hover{
+    color: #572b5e
+}
+.footer-icon{
+    color: #197bd8;
+    font-size: 1.8rem
 }

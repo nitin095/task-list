@@ -1,18 +1,20 @@
 <nav class="sticky-top">
-  
+
   <mat-toolbar class="d-none d-sm-flex">
     <span class="logo" [routerLink]="['/home']">TASK LIST</span>
-   
+
     <span class="nav-spacer"></span>
 
     <!-- tasks search -->
-    <div class="search">
+    <div class="search" *ngIf="url.includes('dashboard')||url.includes('friends')||url.includes('profile')">
       <input type="text" #searcInput placeholder="Search tasks" (keyup.enter)="searchTasks(searcInput.value)">
       <div class="search-result-container" *ngIf="showResults">
         <div class="container">
           <div class="row justify-content-between search-header-row">
             <div class="col-auto">{{searchResults.length}} results</div>
-            <div class="col-auto pt-1"><mat-icon (click)="showResults=false">close</mat-icon></div>
+            <div class="col-auto pt-1">
+              <mat-icon (click)="showResults=false">close</mat-icon>
+            </div>
           </div>
           <div class="row" *ngFor="let task of searchResults" [routerLink]="['/dashboard']" [queryParams]="{taskId: task.taskId}"
             (click)="showResults=false">
@@ -30,11 +32,10 @@
       [routerLink]="['/friends']">
       <mat-icon>group</mat-icon>
     </button>
-    <button class="px-1" mat-icon-button matTooltip="Notifications">
+    <button class="px-1" mat-icon-button matTooltip="Notifications" *ngIf="url.includes('dashboard')||url.includes('profile')">
       <mat-icon>notifications</mat-icon>
     </button>
-    <button class="nav-btn" mat-stroked-button color="primary" *ngIf="url.includes('home')" [routerLink]="['/login']"
-      (click)="reload()">Login</button>
+    <button class="nav-btn" mat-stroked-button color="primary" *ngIf="url.includes('home')" [routerLink]="['/login']">Login</button>
     <div matRipple class="ml-2 circle" [matMenuTriggerFor]="menu" *ngIf="!url.includes('home') && !url.includes('login')">{{getInitials()}}</div>
     <mat-menu #menu="matMenu">
       <button mat-menu-item [routerLink]="['profile']">
@@ -52,16 +53,14 @@
     <span class="logo" [routerLink]="['/home']">TASK LIST</span>
     <span class="nav-spacer"></span>
     <button class="nav-btn" mat-stroked-button color="primary" *ngIf="url.includes('home')" [routerLink]="['/login']"
-    (click)="reload()">Login</button>
+      (click)="reload()">Login</button>
     <div matRipple class="ml-2 circle" [matMenuTriggerFor]="smallMenu" *ngIf="!url.includes('home') && !url.includes('login')">{{getInitials()}}</div>
     <mat-menu #smallMenu="matMenu">
-      <button mat-menu-item *ngIf="url.includes('friends')||url.includes('profile')"
-        [routerLink]="['/dashboard']">
+      <button mat-menu-item *ngIf="url.includes('friends')||url.includes('profile')" [routerLink]="['/dashboard']">
         <mat-icon>dashboard</mat-icon>
         <span>Dashoard</span>
       </button>
-      <button mat-menu-item *ngIf="url.includes('dashboard')||url.includes('profile')"
-        [routerLink]="['/friends']">
+      <button mat-menu-item *ngIf="url.includes('dashboard')||url.includes('profile')" [routerLink]="['/friends']">
         <mat-icon>group</mat-icon>
         <span>Friends</span>
       </button>
@@ -80,17 +79,44 @@
 
 <router-outlet></router-outlet>
 
+
+<!-- footer -->
 <footer *ngIf="url.includes('home')||url.includes('login')">
-  <div class="container py-3">
-    <div class="row">
-      <div class="col">
-        <small>&copy; Nitin Shokeen 2018</small>
-      </div>
-      <div class="col">
-        <div class="row justify-content-end">
-          <button mat-button color="primary">Github Repository</button>
+  <div class="container pt-5">
+    <div class="row py-4 align-items-center">
+      <div class="col-12 col-md-4 mb-4 mb-md-0 text-center text-md-left">
+        <div class="row">
+          <span class="col-12">API Documentation</span>
+          <div class="col-12">
+            <a class="footer-link" href="https://nitin095.github.io/task-list-api-documentation/ " target="blank">task-list-documentation</a>
+          </div>
+          <span class="col-12">Github repository</span>
+          <div class="col-12">
+            <a class="footer-link" href="https://github.com/nitin095/task-list" target="blank">github.com/nitin095/task-list</a>
+          </div>
         </div>
       </div>
+      <div class="col-12 col-md-4 mb-4 mb-md-0 text-center">
+        <div class="row">
+          <div class="col-12">
+            <mat-icon class="mr-2 footer-icon">email</mat-icon>
+          </div>
+          <span class="col-12 lead">nitinshokeen9@gmail.com</span>
+        </div>
+      </div>
+      <div class="col-12 col-md-4 text-center">
+        <div class="row">
+          <div class="col-12">
+            <a href="https://github.com/nitin095" target="blank">
+              <mat-icon class="mr-2 footer-icon">code</mat-icon>
+            </a>
+          </div>
+          <div class="col-12 lead">github.com/nitin095</div>
+        </div>
+      </div>
+    </div>
+    <div class="row py-1">
+      <small class="col text-center">&copy; 2018 Nitin Shokeen</small>
     </div>
   </div>
 </footer>

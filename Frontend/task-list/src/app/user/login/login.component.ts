@@ -25,9 +25,6 @@ export class LoginComponent implements OnInit {
 
   }
 
-  reload() {
-    window.location.reload();
-  }
 
   login(): any {
 

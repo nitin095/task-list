@@ -8,17 +8,17 @@
           <mat-icon>menu</mat-icon>
         </button>
       </div>
-      <div class="vh10" (click)="activeList=null;isActive.value='day'">
+      <div class="vh10" (click)="activeList=null;showTodayList=true;calendarOptions = null;showImportantList=false;isActive.value='day'">
         <mat-icon [ngClass]="{'active': isActive.value=='day'}">wb_sunny</mat-icon>
       </div>
-      <div class="vh10 no-focus" (click)="activeList=null;showImportantList=true;calendarOptions = null;isActive.value='imp'"
+      <div class="vh10 no-focus" (click)="activeList=null;showImportantList=true;showTodayList=false;calendarOptions = null;isActive.value='imp'"
         [routerLink]="['/dashboard']">
         <mat-icon [ngClass]="{'active': isActive.value=='imp'}">bookmark</mat-icon>
       </div>
-      <div class="vh10" (click)="activeList=null;showImportantList=false;loadCalender();isActive.value='cal'">
+      <div class="vh10" (click)="activeList=null;showImportantList=false;loadCalender();showTodayList=false;isActive.value='cal'">
         <mat-icon [ngClass]="{'active': isActive.value=='cal'}">date_range</mat-icon>
       </div>
-      <div class="vh10 side-nav-icon" *ngFor="let list of lists" (click)="makeListActive(list);isActive.value=list.listId"
+      <div class="vh10 side-nav-icon" *ngFor="let list of lists" (click)="makeListActive(list);showTodayList=false;isActive.value=list.listId"
         matTooltip="{{list.title}}">
         <mat-icon [ngClass]="{'active': isActive.value==list.listId}">list</mat-icon>
       </div>
@@ -34,14 +34,14 @@
         <!-- drawer -->
         <mat-drawer #drawer [mode]="mobileQuery.matches ? 'over' : 'side'" opened="true">
           <div class="vh10"></div>
-          <div class="vh10" style="justify-content: flex-start" (click)="isActive.value='day'" [ngClass]="{'active-bg': isActive.value=='day'}">
+          <div class="vh10" style="justify-content: flex-start" (click)="activeList=null;showTodayList=true;showImportantList=false;calendarOptions=null;isActive.value='day'" [ngClass]="{'active-bg': isActive.value=='day'}">
             <span>Today</span>
           </div>
-          <div class="vh10 no-focus" style="justify-content: flex-start" (click)="activeList=null;showImportantList=true;calendarOptions = null;isActive.value='imp'"
+          <div class="vh10 no-focus" style="justify-content: flex-start" (click)="activeList=null;showTodayList=false;showImportantList=true;calendarOptions = null;isActive.value='imp'"
             [routerLink]="['/dashboard']" [ngClass]="{'active-bg': isActive.value=='imp'}">
             <span>Important</span>
           </div>
-          <div class="vh10" style="justify-content: flex-start" (click)="activeList=null;showImportantList=false;loadCalender();isActive.value='cal'"
+          <div class="vh10" style="justify-content: flex-start" (click)="activeList=null;showTodayList=false;showImportantList=false;loadCalender();isActive.value='cal'"
             [ngClass]="{'active-bg': isActive.value=='cal'}">
             <span>Calendar</span>
           </div>
@@ -141,8 +141,11 @@
                   <small>Due by {{task.dueDate | date}}</small>
                 </div>
                 <div class="col-1">
-                  <mat-icon class="not-imp" *ngIf="!task.isImportant" (click)="task.isImportant=true;saveTask({isImportant:true},task.taskId)">bookmark_border</mat-icon>
-                  <mat-icon class="imp" *ngIf="task.isImportant" (click)="task.isImportant=false;saveTask({isImportant:false},task.taskId)">bookmark</mat-icon>
+                  <mat-icon class="not-imp" *ngIf="!task.isImportant" (click)="task.isImportant=true;markTaskImportant(task)">bookmark_border</mat-icon>
+                  <mat-icon class="imp" *ngIf="task.isImportant" (click)="task.isImportant=false;markTaskUnimportant(task)">bookmark</mat-icon>
+                </div>
+                <div class="col-1">
+                  <mat-icon class="today" [ngClass]="{'sun': task.today}" (click)="task.today?task.today=false:task.today=true;toggleMarkTaskToday(task)">wb_sunny</mat-icon>
                 </div>
               </div>
               <div class="row pt-2">
@@ -267,10 +270,10 @@
                                   <mat-checkbox [(ngModel)]="task.isDone" (change)="saveSubTask(task._id,task.isDone)"
                                     color="primary"></mat-checkbox>
                                 </div>
-                                <div class="col pl-0">
+                                <div class="col p-0">
                                   <span [style.text-decoration]="task.isDone?'line-through':'none'">{{task.title}}</span>
                                 </div>
-                                <div class="col-auto">
+                                <div class="col-1 p-0">
                                   <mat-icon style="color:lightgrey;cursor: pointer;" (click)="deleteSubTask(task._id)">close</mat-icon>
                                 </div>
                               </div>
@@ -336,7 +339,6 @@
                             <small class="small-link" (click)="deleteComment(comment._id)">Delete</small>
                           </div>
                           <div class="col-auto" *ngIf="comment.editing">
-                            <!-- <small class="pr-2 small-link" (click)="editComment(comment._id,comment-edit.value)">Save</small> -->
                             <small class="small-link" (click)="comment.editing=false">Cancel</small>
                           </div>
                         </div>
@@ -359,7 +361,6 @@
                             <button mat-icon-button color="primary" (click)="addComment(enteredComment);enteredComment=null">
                               <mat-icon>send</mat-icon>
                             </button>
-                            <!-- <button mat-stroked-button (click)="addComment(enteredComment);enteredComment=null">SEND</button> -->
                           </div>
                         </div>
                       </div>
@@ -391,7 +392,7 @@
             </div>
             <div class="col-12 col-lg-auto py-3 py-sm-0">
               <div class="row justify-content-end">
-                <div class="col-3 col-sm-2">
+                <div class="col-3 col-sm-2 col-lg-auto">
                   <div class="row text-center p-0">
                     <div class="col-12">
                       <mat-icon>sort</mat-icon>
@@ -399,7 +400,7 @@
                     <small class="col-12" style="line-height:0.1rem">Sort</small>
                   </div>
                 </div>
-                <div class="col-6 col-sm">
+                <div class="col-6 col-sm-4 col-lg-auto">
                   <div class="row text-center">
                     <small class="col-12 pb-2">
                       {{completedImportantTasks}} of {{importantTasks.length}} tasks completed
@@ -448,6 +449,67 @@
         <!-- end important tasks list view -->
 
 
+           <!-- today tasks list view header -->
+           <div class="container list-header sticky-top" *ngIf="showTodayList">
+              <div class="row py-4 justify-content-between">
+                <div class="col-12 col-sm-auto">
+                  <div class="row px-4">
+                    <div class="display-4" style="font-size:2rem;font-weight:400">
+                      Today
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 col-lg-auto py-3 py-sm-0">
+                  <div class="row justify-content-end">
+                    <div class="col-3 col-sm-2 col-lg-auto">
+                      <div class="row text-center p-0">
+                        <div class="col-12">
+                          <mat-icon>sort</mat-icon>
+                        </div>
+                        <small class="col-12" style="line-height:0.1rem">Sort</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- end important list view header -->
+
+
+             <!-- today tasks list view -->
+        <div class="container" *ngIf="todayTasks && showTodayList">
+            <div class="row" *ngIf="showTodayList">
+  
+              <div class="col-12">
+                <div class="row align-items-center task-list-item" *ngFor="let task of todayTasks">
+                  <div class="col-1 pt-1 text-center">
+                    <mat-checkbox style="font-size:2rem;z-index:99" [(ngModel)]="task.isDone" (change)="setTaskStatus(task)"
+                      color="primary"></mat-checkbox>
+                  </div>
+                  <div class="col-9 col-sm text-left" [routerLink]="['/dashboard']" [queryParams]="{taskId: task.taskId}"
+                    style="cursor:pointer">
+                    <span class="lead" [style.text-decoration]="task.isDone?'line-through':'none'">{{task.title}}</span>
+                  </div>
+                  <div class="col-2 d-none d-sm-flex">
+                    <small>{{task.subTask.length}} Subtasks</small>
+                  </div>
+                  <div class="col-2 due-date d-none d-sm-flex">
+                    <small>Due by {{task.dueDate | date}}</small>
+                  </div>
+                  <div class="col-1">
+                    <mat-icon class="not-imp" *ngIf="!task.isImportant" (click)="task.isImportant=true;saveTask({isImportant:true},task.taskId)">bookmark_border</mat-icon>
+                    <mat-icon class="imp" *ngIf="task.isImportant" (click)="task.isImportant=false;saveTask({isImportant:false},task.taskId)">bookmark</mat-icon>
+                  </div>
+                </div>
+              </div>
+  
+            </div>
+          </div>
+          <!-- end important tasks list view -->
+
+
+
+
         <!-- calender view -->
         <div class="container">
           <div class="row">
@@ -475,7 +537,8 @@
     </div>
     <div class="row">
       <div class="col-auto" *ngFor="let friend of friends">
-        <div class="friend-chip" [ngClass]="{'selected-chip': selectedFriends.includes(friend.userId)}" (click)="selectedFriends.push(friend.userId)">{{friend.firstName}} {{friend.lastName}}</div>
+        <div class="friend-chip" [ngClass]="{'selected-chip': selectedFriends.includes(friend.userId)}" (click)="selectedFriends.push(friend.userId)">{{friend.firstName}}
+          {{friend.lastName}}</div>
       </div>
     </div>
     <div class="row justify-content-end" style="position:absolute; bottom: 5%;right:5%">

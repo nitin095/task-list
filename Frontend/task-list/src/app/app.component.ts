@@ -22,9 +22,6 @@ export class AppComponent {
     });
   }
 
-  reload() {
-    window.location.reload();
-  }
 
   public logout: any = () => {
     this.userDetails = this.appService.getUserInfoFromLocalstorage();
@@ -45,6 +42,7 @@ export class AppComponent {
     });
   } // end logout
 
+  
   getInitials() {
     let initials = `${this.userDetails.firstName[0]}${this.userDetails.lastName[0]}`
     return initials

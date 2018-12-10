@@ -30,25 +30,10 @@
             <button class="login-btn" mat-flat-button (click)="showProgressBar=true;login()">LOGIN</button>
           </mat-card-actions>
         </mat-card>
-
-        <div class="col-auto p-0 mx-5 line">
-          <span class="or py-2">OR</span>
-        </div>
-
-        <mat-card class="example-card col-auto mx-2">
-          <mat-card-header>
-            <mat-card-title>Continue using Google</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="row justify-content-center align-items-center" style="height:100px">
-              <div class="col-auto g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div>
-            </div>
-          </mat-card-content>
-        </mat-card>
       </div>
       <div class="row justify-content-center no-gutters">
         <span class="lead mt-5" style="font-size:1rem">Don't have a account?<button mat-button color="primary"
-            [routerLink]="['/home']" (click)="reload()">Signup</button> </span>
+            [routerLink]="['/home']">Signup</button> </span>
       </div>
     </div>
   </div>
