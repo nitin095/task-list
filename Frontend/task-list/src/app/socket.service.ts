@@ -11,7 +11,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 })
 export class SocketService {
 
-  private url = 'http://localhost:3000';
+  private url = 'http://ec2-13-233-92-229.ap-south-1.compute.amazonaws.com/api';
 
   private receiverId: string = Cookie.get('receiverId');
   private socket;
