@@ -11,6 +11,8 @@ export class AppService {
 
   private baseUrl = 'http://ec2-13-233-92-229.ap-south-1.compute.amazonaws.com/api/v1';
 
+  // private baseUrl = 'http://localhost:3000/api/v1';
+
   private authToken: string = Cookie.get('authtoken');
 
 
@@ -85,27 +87,27 @@ export class AppService {
   }
 
   createList(listData): Observable<any> {
-    let response = this._http.post(`${this.baseUrl}/lists/create`, listData)
+    let response = this._http.post(`${this.baseUrl}/lists/create?authToken=${this.authToken}`, listData)
     return response
   }
 
   getSingleList(listId): Observable<any> {
-    let response = this._http.get(`${this.baseUrl}/lists/${listId}/details`)
+    let response = this._http.get(`${this.baseUrl}/lists/${listId}/details?authToken=${this.authToken}`)
     return response
   }
 
   editList(listId, data): Observable<any> {
-    let response = this._http.put(`${this.baseUrl}/lists/${listId}/edit`, data)
+    let response = this._http.put(`${this.baseUrl}/lists/${listId}/edit?authToken=${this.authToken}`, data)
     return response
   }
 
   getListTasks(listId): Observable<any> {
-    let response = this._http.get(`${this.baseUrl}/tasks/list/${listId}`)
+    let response = this._http.get(`${this.baseUrl}/tasks/list/${listId}?authToken=${this.authToken}`)
     return response
   }
 
   createTask(taskData): Observable<any> {
-    let response = this._http.post(`${this.baseUrl}/tasks/create`, taskData)
+    let response = this._http.post(`${this.baseUrl}/tasks/create?authToken=${this.authToken}`, taskData)
     return response
   }
 
@@ -115,87 +117,87 @@ export class AppService {
   }
 
   deleteTaskComment(taskId, comment): Observable<any> {
-    let response = this._http.post(`${this.baseUrl}/tasks/${taskId}/commentDelete`, comment)
+    let response = this._http.post(`${this.baseUrl}/tasks/${taskId}/commentDelete?authToken=${this.authToken}`, comment)
     return response
   }
 
   editTaskComment(taskId, comment): Observable<any> {
-    let response = this._http.put(`${this.baseUrl}/tasks/${taskId}/edit/comment`, comment)
+    let response = this._http.put(`${this.baseUrl}/tasks/${taskId}/edit/comment?authToken=${this.authToken}`, comment)
     return response
   }
 
   editTask(taskId, data): Observable<any> {
-    let response = this._http.put(`${this.baseUrl}/tasks/${taskId}/edit`, data)
+    let response = this._http.put(`${this.baseUrl}/tasks/${taskId}/edit?authToken=${this.authToken}`, data)
     return response
   }
 
   deleteTask(taskId): Observable<any> {
-    let response = this._http.post(`${this.baseUrl}/tasks/${taskId}/delete`, '')
+    let response = this._http.post(`${this.baseUrl}/tasks/${taskId}/delete?authToken=${this.authToken}`, '')
     return response
   }
 
   getSingleTask(taskId): Observable<any> {
-    let response = this._http.get(`${this.baseUrl}/tasks/${taskId}/details`)
+    let response = this._http.get(`${this.baseUrl}/tasks/${taskId}/details?authToken=${this.authToken}`)
     return response
   }
 
   createSubTask(taskId, taskData): Observable<any> {
-    let response = this._http.post(`${this.baseUrl}/tasks/subTask/create/${taskId}`, taskData)
+    let response = this._http.post(`${this.baseUrl}/tasks/subTask/create/${taskId}?authToken=${this.authToken}`, taskData)
     return response
   }
 
   deleteSubTask(taskId,subTask_id): Observable<any> {
-    let response = this._http.post(`${this.baseUrl}/tasks/${taskId}/${subTask_id}/delete`,'')
+    let response = this._http.post(`${this.baseUrl}/tasks/${taskId}/${subTask_id}/delete?authToken=${this.authToken}`,'')
     return response
   }
 
   setSubTaskStatus(taskId, subTask_id, isDone): Observable<any> {
-    let response = this._http.put(`${this.baseUrl}/tasks/${taskId}/${subTask_id}/status`, {isDone: isDone})
+    let response = this._http.put(`${this.baseUrl}/tasks/${taskId}/${subTask_id}/status?authToken=${this.authToken}`, {isDone: isDone})
     return response
   }
 
   getAllTasks(userId): Observable<any> {
-    let response = this._http.get(`${this.baseUrl}/tasks/all/${userId}`)
+    let response = this._http.get(`${this.baseUrl}/tasks/all/${userId}?authToken=${this.authToken}`)
     return response
   }
 
   getAllFriends(userId): Observable<any> {
-    let response = this._http.get(`${this.baseUrl}/users/${userId}/friends`)
+    let response = this._http.get(`${this.baseUrl}/users/${userId}/friends?authToken=${this.authToken}`)
     return response
   }
 
   getMultipleUsers(userIds): Observable<any> {
-    let response = this._http.get(`${this.baseUrl}/users/view/${userIds}`)
+    let response = this._http.get(`${this.baseUrl}/users/view/${userIds}?authToken=${this.authToken}`)
     return response
   }
 
   searchFriends(search): Observable<any> {
-    let response = this._http.get(`${this.baseUrl}/users/friends/?search=${search}`)
+    let response = this._http.get(`${this.baseUrl}/users/friends/?search=${search}&authToken=${this.authToken}`)
     return response
   }
 
   addFriend(userId, friend): Observable<any> {
-    let response = this._http.post(`${this.baseUrl}/users/${userId}/friends/add`, friend)
+    let response = this._http.post(`${this.baseUrl}/users/${userId}/friends/add?authToken=${this.authToken}`, friend)
     return response
   }
 
   removeFriend(userId, friend): Observable<any> {
-    let response = this._http.put(`${this.baseUrl}/users/${userId}/friends/remove`, friend)
+    let response = this._http.put(`${this.baseUrl}/users/${userId}/friends/remove?authToken=${this.authToken}`, friend)
     return response
   }
 
   acceptFriendRequest(userId, friend): Observable<any> {
-    let response = this._http.put(`${this.baseUrl}/users/${userId}/friends/accept`, friend)
+    let response = this._http.put(`${this.baseUrl}/users/${userId}/friends/accept?authToken=${this.authToken}`, friend)
     return response
   }
 
   cancelSentRequest(userId, friend): Observable<any> {
-    let response = this._http.put(`${this.baseUrl}/users/${userId}/friends/cancel`, friend)
+    let response = this._http.put(`${this.baseUrl}/users/${userId}/friends/cancel?authToken=${this.authToken}`, friend)
     return response
   }
 
   ignoreReceivedRequest(userId, friend): Observable<any> {
-    let response = this._http.put(`${this.baseUrl}/users/${userId}/friends/ignore`, friend)
+    let response = this._http.put(`${this.baseUrl}/users/${userId}/friends/ignore?authToken=${this.authToken}`, friend)
     return response
   }
 

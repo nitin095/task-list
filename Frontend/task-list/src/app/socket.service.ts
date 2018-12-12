@@ -10,13 +10,16 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
   providedIn: 'root'
 })
 export class SocketService {
-
+  
   private url = 'http://ec2-13-233-92-229.ap-south-1.compute.amazonaws.com';
+
+  // private url = "http://localhost:3000"
 
   private receiverId: string = Cookie.get('receiverId');
   private socket;
 
   constructor(public http: HttpClient) {
+    console.log('socket service called')
     this.socket = io(this.url);
   }
 

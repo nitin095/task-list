@@ -326,7 +326,7 @@ module.exports.setRouter = (app) => {
 	 *
 	 * {
 	    "error": true,
-	    "message": "Error Occured.,
+	    "message": "Error Occured.",
 	    "status": 500,
 	    "data": null
 	   }

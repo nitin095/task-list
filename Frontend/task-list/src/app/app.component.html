@@ -36,7 +36,7 @@
       <mat-icon>notifications</mat-icon>
     </button>
     <button class="nav-btn" mat-stroked-button color="primary" *ngIf="url.includes('home')" [routerLink]="['/login']">Login</button>
-    <div matRipple class="ml-2 circle" [matMenuTriggerFor]="menu" *ngIf="!url.includes('home') && !url.includes('login')">{{getInitials()}}</div>
+    <div matRipple class="ml-2 circle" [matMenuTriggerFor]="menu" *ngIf="url.includes('dashboard') || url.includes('friends') || url.includes('profile')">{{getInitials()}}</div>
     <mat-menu #menu="matMenu">
       <button mat-menu-item [routerLink]="['profile']">
         <mat-icon>person</mat-icon>
@@ -54,7 +54,7 @@
     <span class="nav-spacer"></span>
     <button class="nav-btn" mat-stroked-button color="primary" *ngIf="url.includes('home')" [routerLink]="['/login']"
       (click)="reload()">Login</button>
-    <div matRipple class="ml-2 circle" [matMenuTriggerFor]="smallMenu" *ngIf="!url.includes('home') && !url.includes('login')">{{getInitials()}}</div>
+    <div matRipple class="ml-2 circle" [matMenuTriggerFor]="smallMenu" *ngIf="url.includes('dahboard') || url.includes('friends') || url.includes('profile')">{{getInitials()}}</div>
     <mat-menu #smallMenu="matMenu">
       <button mat-menu-item *ngIf="url.includes('friends')||url.includes('profile')" [routerLink]="['/dashboard']">
         <mat-icon>dashboard</mat-icon>

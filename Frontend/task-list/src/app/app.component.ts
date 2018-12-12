@@ -28,9 +28,6 @@ export class AppComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.authToken = Cookie.get('authtoken');
-    this.verifyUserConfirmation();
-    this.getNotifications();
   }
 
 
@@ -55,6 +52,9 @@ export class AppComponent implements OnInit {
 
 
   getInitials() {
+    this.authToken = Cookie.get('authtoken');
+    this.verifyUserConfirmation();
+    this.getNotifications();
     let initials = `${this.userDetails.firstName[0]}${this.userDetails.lastName[0]}`
     return initials
   }
