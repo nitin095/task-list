@@ -234,6 +234,7 @@ let getListTasks = (req, res) => {
         })
 }// end get all list tasks
 
+
 // Get single task details 
 let getSingleTask = (req, res) => {
 
@@ -305,6 +306,7 @@ let editComment = (req, res) => {
 
 }// end edit comment
 
+
 let setSubTaskStatus = (req, res) => {
     taskModel.updateOne({ 'taskId': req.params.taskId, 'subTask._id': req.params.subTask_id },
         { $set: { 'subTask.$.isDone': req.body.isDone } }, (err, result) => {
@@ -349,21 +351,59 @@ let editSubTaskComment = (req, res) => {
 
 // Delete task
 let deleteTask = (req, res) => {
-    taskModel.findOneAndRemove({ 'taskId': req.params.taskId }).exec((err, result) => {
-        if (err) {
-            console.log(err)
-            logger.error(err.message, 'Task Controller: deletetask', 10)
-            let apiResponse = response.generate(true, 'Failed To delete task', 500, null)
-            res.send(apiResponse)
-        } else if (check.isEmpty(result)) {
-            logger.info('No task Found', 'task Controller: deletetask')
-            let apiResponse = response.generate(true, 'No task Found', 404, null)
-            res.send(apiResponse)
-        } else {
-            let apiResponse = response.generate(false, 'Deleted the task successfully', 200, result)
-            res.send(apiResponse)
-        }
-    });
+
+    let removeTaskFromList = () => {
+        return new Promise((resolve, reject) => {
+            if (check.isEmpty(req.body.title && req.body.listId)) {
+                let apiResponse = response.generate(true, 'required parameters are missing', 403, null)
+                reject(apiResponse)
+            } else {
+                listModel.findOneAndUpdate({ "listId": req.body.listId },
+                    { $pull: { tasks: taskId } },
+                    (error, result) => {
+                        if (error) {
+                            logger.error(`Error Occured : ${error}`, 'Database', 10)
+                            let apiResponse = response.generate(true, 'Error Occured.', 500, null)
+                            res.send(apiResponse)
+                            reject(error)
+                        } else {
+                            resolve()
+                        }
+                    });
+            }
+        })
+    }// end addTaskToList
+
+    let removeTask = () => {
+        taskModel.findOneAndRemove({ 'taskId': req.params.taskId }).exec((err, result) => {
+            if (err) {
+                console.log(err)
+                logger.error(err.message, 'Task Controller: deletetask', 10)
+                let apiResponse = response.generate(true, 'Failed To delete task', 500, null)
+                reject(apiResponse)
+            } else if (check.isEmpty(result)) {
+                logger.info('No task Found', 'task Controller: deletetask')
+                let apiResponse = response.generate(true, 'No task Found', 404, null)
+                reject(apiResponse)
+            } else {
+                resolve(apiResponse)
+            }
+        });
+    }// end removeTask
+
+    // promise call
+    removeTaskFromList()
+        .then(removeTask)
+        .then((result) => {
+            let apiResponse = response.generate(false, 'Task deleted successfully', 200, result);
+            res.send(apiResponse);
+        })
+        .catch((err) => {
+            console.log("error handler");
+            console.log(err);
+            res.status(err.status)
+            res.send(err)
+        })
 
 }// end delete task
 
@@ -385,6 +425,7 @@ let deleteSubTask = (req, res) => {
             }
         });
 }
+
 
 // Delete task
 let deleteComment = (req, res) => {

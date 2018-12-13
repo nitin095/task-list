@@ -43,7 +43,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   public taskProgress: number;
   public activeTaskCompletedSubTasks: number;
   public activeTask: any;
- 
+
 
   private _mobileQueryListener: () => void;
 
@@ -226,10 +226,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
           this.activeListCompletedTasks = this.activeListTasks.filter(task => task.isDone).length;
           this.listProgress = (this.activeListCompletedTasks / this.activeListTasks.length) * 100;
         } else {
-          this.activeListTasks = null;
+          this.activeListTasks = [];
           this.activeListCompletedTasks = 0;
           this.listProgress = 0;
-          console.log(response.message)
         }
       },
       error => {
@@ -251,7 +250,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.appService.createTask(taskData).subscribe(
       response => {
         if (response.status === 200) {
-          this.getActiveListTasks(this.activeList.listId)
+          this.getActiveListTasks(this.activeList.listId);
+          this.lists.map(list => list.listId == this.activeList.listId ? list.tasks.push('newTask') : list)
           console.log(response.data)
         } else {
           this.snackBar.open(response.message, 'Close', { duration: 4000, });
@@ -294,9 +294,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   toggleMarkTaskToday(task) {
-
     this.todayTasks.includes(task) ? this.todayTasks.splice(this.todayTasks.indexOf(task), 1) : this.todayTasks.push(task)
-    console.log(this.todayTasks)
   }
 
   deleteTask(taskId) {
@@ -305,6 +303,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         if (response.status === 200) {
           this.showTasksList = true;
           this.getActiveListTasks(this.activeList.listId);
+          this.lists.map(list => list.listId == this.activeList.listId ? list.tasks.pop() : list)
           this.snackBar.open('Task deleted', 'Close', { duration: 4000 });
           console.log(response)
         } else {
@@ -505,36 +504,40 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   loadCalender(): any {
-    let tasks = Object.keys(this.allTasks).map(i => this.allTasks[i])
-    this.calendarOptions = {
-      header: {
-        left: 'prev,next today',
-        center: 'title',
-        right: 'month,listMonth'
-      },
-      events: function (start, end, timezone, callback) {
-        let events = [];
-        // let userMeetings = this.allTasks
-        for (let task of tasks) {
-          events.push({
-            title: task.title,
-            start: task.dueDate,
-            taskId: task.taskId
-          });
-        }
-        callback(events);
-      },//end events
-      timezone: 'local',
-      eventTextColor: 'white',
-      timeFormat: 'h(:mm)t',
-      height: 'parent'
-    };//end calenderOptions
 
-  }
+    this.appService.getAllTasks(this.userDetails.userId).subscribe(
+      response => {
+        let tasks = Object.keys(response.data).map(i => response.data[i])
+        this.calendarOptions = {
+          header: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'month,listMonth'
+          },
+          events: function (start, end, timezone, callback) {
+            let events = [];
+            for (let task of tasks) {
+              events.push({
+                title: task.title,
+                start: task.dueDate,
+                taskId: task.taskId
+              });
+            }
+            callback(events);
+          },//end events
+          timezone: 'local',
+          eventTextColor: 'white',
+          timeFormat: 'h(:mm)t',
+          height: 'parent'
+        };//end calenderOptions
+      }
+    )
+
+  }// end  loadCalender
 
   eventClick(task) {
     this.router.navigate(['/dashboard'], { queryParams: { taskId: task.taskId } });
   }
 
-  
+
 }// end DashboardComponent class

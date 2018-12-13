@@ -26,7 +26,7 @@ export class FriendsComponent implements OnInit {
   constructor(private _route: ActivatedRoute, private router: Router, private appService: AppService, public SocketService: SocketService, public snackBar: MatSnackBar) { }
 
   ngOnInit() {
-    this.getNotifications();
+    // this.getNotifications();
     this.getAllFriends();
     if (this.userDetails.friendRequests) this.getFriendRequests()
     if (this.userDetails.friendRequestsSent) this.getFriendRequestsSent()

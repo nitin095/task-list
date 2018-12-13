@@ -19,7 +19,6 @@ export class SocketService {
   private socket;
 
   constructor(public http: HttpClient) {
-    console.log('socket service called')
     this.socket = io(this.url);
   }
 

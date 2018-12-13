@@ -20,7 +20,7 @@
               <div class="row">
                 <mat-form-field class="col">
                   <input matInput placeholder="Password" name="password" required [type]="hide ? 'password' : 'text'"
-                    [(ngModel)]="password">
+                    [(ngModel)]="password" (keyup.enter)="showProgressBar=true;login()">
                   <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
                 </mat-form-field>
               </div>

@@ -50,7 +50,7 @@
             [ngClass]="{'active-bg': isActive.value==list.listId}">
             <div style="display: inline-flex;justify-content: space-between;width:100%">
               <span>{{list.title}}</span>
-              <span>1</span>
+              <span>{{list.tasks.length}}</span>
             </div>
           </div>
           <div class="vh10" style="justify-content: flex-start">

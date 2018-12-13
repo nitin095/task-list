@@ -17,7 +17,6 @@ export class AppService {
 
 
   constructor(private _http: HttpClient) {
-    console.log('app-service called');
   }
 
   private handleError(err: HttpErrorResponse) {
