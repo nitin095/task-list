@@ -135,7 +135,7 @@ module.exports.setRouter = (app) => {
     /**
 	 * @api {put} /api/v1/lists/:listId/edit Edit list by listId
 	 * @apiVersion 0.0.1
-	 * @apiGroup edit
+	 * @apiGroup update
 	 *
 	 * @apiParam {String} authToken The token for authentication.(Send authToken as query parameter, body parameter or as a header)
 	 * @apiParam {String} title title of the list passed as the Body parameter

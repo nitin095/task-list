@@ -97,7 +97,7 @@ module.exports.setRouter = (app) => {
 	 *  @apiSuccessExample {json} Success-Response:
 	 *  {
 	    "error": false,
-	    "message": "Users Found.",
+	    "message": "Friends Found.",
 	    "status": 200,
 	    "data": {
 					userId: "string",
@@ -106,7 +106,8 @@ module.exports.setRouter = (app) => {
 					email: "mstring",
 					countryCode: number,
 					mobileNumber: number,
-				}
+				},
+				...
 	    }
 	  @apiErrorExample {json} Error-Response:
 	 *
@@ -152,7 +153,7 @@ module.exports.setRouter = (app) => {
     /**
 	 * @api {put} /api/v1/users/:userId/friends/remove Remove friend from user's friend list
 	 * @apiVersion 0.0.1
-	 * @apiGroup create
+	 * @apiGroup update
 	 *
      * @apiParam {String} userId userId of the user passed as the URL parameter
      * @apiParam {String} friendId userId of the friend passed as the body parameter
@@ -219,7 +220,7 @@ module.exports.setRouter = (app) => {
 	 *  @apiSuccessExample {json} Success-Response:
 	 *  {
 	    "error": false,
-	    "message": "User Created Successfully",
+	    "message": "Friend request cancelled",
 	    "status": 200,
 	    "data": []
 	    	}
@@ -338,7 +339,7 @@ module.exports.setRouter = (app) => {
     /**
 	 * @api {put} /api/v1/users/:userId/edit Edit user by userId
 	 * @apiVersion 0.0.1
-	 * @apiGroup edit
+	 * @apiGroup update
 	 *
 	 * @apiParam {String} authToken The token for authentication.(Send authToken as query parameter, body parameter or as a header)
 	 * @apiParam {String} userId userId of the user passed as the URL parameter
@@ -376,7 +377,7 @@ module.exports.setRouter = (app) => {
     /**
 	 * @api {put} /api/v1/users/forgotPassword Recover password by user email
 	 * @apiVersion 0.0.1
-	 * @apiGroup edit
+	 * @apiGroup update
 	 *
 	 * @apiParam {String} email email of the user passed as the Body parameter
 	 *
@@ -407,7 +408,7 @@ module.exports.setRouter = (app) => {
     /**
 	 * @api {put} /api/v1/users/resetPassword Reset password by password reset token
 	 * @apiVersion 0.0.1
-	 * @apiGroup edit
+	 * @apiGroup update
 	 *
 	 * @apiParam {String} token password reset token of the user passed as the Query parameter
 	 *
@@ -468,7 +469,7 @@ module.exports.setRouter = (app) => {
     /**
     * @api {post} /api/v1/users/logout Logout user by authToken
     * @apiVersion 0.0.1
-    * @apiGroup delete
+    * @apiGroup create
     *
     * @apiParam {String} authToken The token for authentication.(Send authToken as query parameter, body parameter or as a header)
     * 
@@ -484,7 +485,7 @@ module.exports.setRouter = (app) => {
     *
     * {
            error: true, 
-           message: "Invalid Or Expired AuthorizationKey", 
+           message: "Invalid Or Expired Authorization Key", 
            status: 404, 
            data: null
    }

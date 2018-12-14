@@ -90,6 +90,10 @@ let taskSchema = new Schema({
     isImportant: {
         type: Boolean,
         default: false
+    },
+    removed: {
+        type: Boolean,
+        default: false
     }
 },
     {

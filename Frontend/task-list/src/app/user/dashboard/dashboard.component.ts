@@ -94,6 +94,17 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.showTodayList = false;
   }
 
+  undo() {
+    this.appService.undo().subscribe(
+      response => {
+        console.log(response)
+        this.getAllTasks();
+        this.getActiveListTasks(this.activeList.listId);
+        this.getSingleTask(this.activeTask.taskId)
+      }
+    );
+  }
+
   loadTask(task) {
     this.showTasksList = false;
     this.showImportantList = false;
@@ -173,6 +184,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       response => {
         this.showProgressBar = false;
         if (response.status === 200) {
+          console.log(response)
           this.allTasks = response.data;
           this.allTasks.map(task => task.today = false);
           this.importantTasks = this.allTasks.filter(task => task.isImportant);
@@ -297,8 +309,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.todayTasks.includes(task) ? this.todayTasks.splice(this.todayTasks.indexOf(task), 1) : this.todayTasks.push(task)
   }
 
-  deleteTask(taskId) {
-    this.appService.deleteTask(taskId).subscribe(
+  deleteTask(listId,taskId) {
+    this.appService.deleteTask(listId,taskId).subscribe(
       response => {
         if (response.status === 200) {
           this.showTasksList = true;
@@ -340,6 +352,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.appService.getSingleTask(taskId).subscribe(
       response => {
         if (response.status === 200) {
+          console.log(response.data)
           this.activeTask = response.data;
           // updating active list tasks with edited data
           this.activeListTasks = this.activeListTasks.map((e, i) => e.taskId == this.activeTask.taskId ? e = this.activeTask : e)
@@ -361,12 +374,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
       createdBy: this.userDetails.userId,
       body: comment
     }
-    console.log('adding comment', commentData)
     this.appService.addTaskComment(this.activeTask.taskId, commentData).subscribe(
       response => {
+        console.log(response)
         if (response.status == 200) {
           this.activeTask.comments.push(commentData)
-          console.log(response)
         } else {
           console.log(response.message)
         }

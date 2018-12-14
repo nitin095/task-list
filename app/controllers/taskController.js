@@ -13,6 +13,20 @@ const mailer = require('../libs/mailer')
 const taskModel = mongoose.model('Task')
 const listModel = mongoose.model('List')
 
+// Array containing undo actions
+let undoStack = [];
+
+
+let undo = async (req, res) => {
+    let undoAction = undoStack.pop();
+    if (!undoAction) res.send(response.generate(true, 'No undo available', 404, null))
+    let undoData = await undoAction.action();
+    undoStack.pop();
+    let apiResponse = response.generate(false, 'Undo successfull', 200, undoData);
+    res.send(apiResponse)
+}
+
+
 // Create task 
 let createTask = (req, res) => {
 
@@ -71,8 +85,13 @@ let createTask = (req, res) => {
     // promise call
     addTaskToList()
         .then(newTask)
-        .then((result) => {
-            let apiResponse = response.generate(false, 'Task Created successfully', 200, result);
+        .then((task) => {
+            undoReq = {
+                body: { listId: task.listId },
+                params: { taskId: task.taskId }
+            }
+            undoStack.push({ action: () => deleteTask(undoReq) });
+            let apiResponse = response.generate(false, 'Task Created successfully', 200, task);
             res.send(apiResponse);
         })
         .catch((err) => {
@@ -108,6 +127,10 @@ let createSubTask = (req, res) => {
                     let apiResponse = response.generate(true, 'Error Occured.', 500, null)
                     res.send(apiResponse);
                 } else {
+                    undoReq = {
+                        params: { taskId: result.taskId, subTask_id: result.subTask_id }
+                    }
+                    undoStack.push({ action: () => deleteSubTask(undoReq) });
                     result.subTask.push(newSubTask)
                     console.log('Success in sub task creation')
                     let apiResponse = response.generate(false, 'Sub task created.', 200, result)
@@ -140,7 +163,11 @@ let createTaskComment = (req, res) => {
                     let apiResponse = response.generate(true, 'Error Occured.', 500, null)
                     res.send(apiResponse);
                 } else {
-                    // result.comments.push(newComment)
+                    undoReq = {
+                        body: { comment_id: result._id },
+                        params: { taskId: req.params.taskId }
+                    }
+                    undoStack.push({ action: () => deleteComment(undoReq) });
                     console.log('Success in comment creation')
                     let apiResponse = response.generate(false, 'Comment created.', 200, result)
                     res.send(apiResponse);
@@ -176,6 +203,11 @@ let createSubTaskComment = (req, res) => {
                     let apiResponse = response.generate(true, 'No Task Found', 404, null)
                     res.send(apiResponse)
                 } else {
+                    undoReq = {
+                        body: { subTask_id: req.body.subTask_id, comment_id: result._id },
+                        params: { taskId: req.params.taskId }
+                    }
+                    undoStack.push({ action: () => deleteSubTaskComment(undoReq) });
                     let apiResponse = response.generate(false, 'Sub task  comment added', 200, result)
                     res.send(apiResponse)
                 }
@@ -189,7 +221,7 @@ let createSubTaskComment = (req, res) => {
 let getAllTasks = (req, res) => {
 
     let filter = req.query.fields ? req.query.fields.replace(new RegExp(";", 'g'), " ") : '';
-    taskModel.find({ 'createdBy': req.params.userId })
+    taskModel.find({ 'createdBy': req.params.userId, 'removed': false })
         .select(`-__v ${filter}`)
         .lean()
         .exec((err, result) => {
@@ -214,7 +246,7 @@ let getAllTasks = (req, res) => {
 let getListTasks = (req, res) => {
     let filter = req.query.fields ? req.query.fields.replace(new RegExp(";", 'g'), " ") : '';
     // taskModel.find({ 'createdBy': req.query.userId })
-    taskModel.find({ listId: req.params.listId })
+    taskModel.find({ listId: req.params.listId, removed: false })
         .select(`-__v ${filter}`)
         .lean()
         .exec((err, result) => {
@@ -239,7 +271,7 @@ let getListTasks = (req, res) => {
 let getSingleTask = (req, res) => {
 
     let filter = req.query.fields ? req.query.fields.replace(new RegExp(";", 'g'), " ") : '';
-    taskModel.findOne({ 'taskId': req.params.taskId })
+    taskModel.findOne({ 'taskId': req.params.taskId, removed: false })
         .select(`-__v -_id ${filter}`)
         .lean()
         .exec((err, result) => {
@@ -263,9 +295,10 @@ let getSingleTask = (req, res) => {
 
 // Edit task
 let editTask = (req, res) => {
-
+    console.log('REQUEST BODY ?????????????????????????????????????/')
+    console.log(req.body)
     let options = req.body;
-    taskModel.update({ 'taskId': req.params.taskId }, options).exec((err, result) => {
+    taskModel.findOneAndUpdate({ 'taskId': req.params.taskId }, options).exec((err, result) => {
         if (err) {
             console.log(err)
             logger.error(err.message, 'task Controller:edittask', 10)
@@ -276,8 +309,15 @@ let editTask = (req, res) => {
             let apiResponse = response.generate(true, 'No task Found', 404, null)
             res.send(apiResponse)
         } else {
-            let apiResponse = response.generate(false, 'task details edited', 200, result)
-            res.send(apiResponse)
+            delete (result.createdOn)
+            delete (result.lastModified)
+            undoReq = {
+                body: result,
+                params: { taskId: req.params.taskId }
+            }
+            undoStack.push({ action: () => editTask(undoReq) });
+            let apiResponse = response.generate(false, 'task details edited', 200, null)
+            if (res) res.send(apiResponse)
         }
     });
 
@@ -287,7 +327,7 @@ let editTask = (req, res) => {
 // Edit comment
 let editComment = (req, res) => {
 
-    taskModel.updateOne({ 'taskId': req.params.taskId, 'comments._id': req.body.comment_id },
+    taskModel.findOneAndUpdate({ 'taskId': req.params.taskId, 'comments._id': req.body.comment_id },
         { 'comments.$.body': req.body.body }).exec((err, result) => {
             if (err) {
                 console.log(err)
@@ -299,6 +339,12 @@ let editComment = (req, res) => {
                 let apiResponse = response.generate(true, 'No task Found', 404, null)
                 res.send(apiResponse)
             } else {
+                let commentBodyBeforeEdit = result.comments.filter(comment => comment._id == req.body.comment_id)[0].body;
+                undoReq = {
+                    body: { comment_id: req.body.comment_id, body: commentBodyBeforeEdit },
+                    params: { taskId: req.params.taskId }
+                }
+                undoStack.push({ action: () => editComment(undoReq) });
                 let apiResponse = response.generate(false, 'Comment edited', 200, result)
                 res.send(apiResponse)
             }
@@ -320,6 +366,11 @@ let setSubTaskStatus = (req, res) => {
                 let apiResponse = response.generate(true, 'No subtask Found', 404, null)
                 res.send(apiResponse)
             } else {
+                undoReq = {
+                    body: { isDone: !isDone },
+                    params: { taskId: req.params.taskId, subTask_id: req.params.subTask_id }
+                }
+                undoStack.push({ action: () => setSubTaskStatus(undoReq) });
                 let apiResponse = response.generate(false, 'Subtask edited', 200, result)
                 res.send(apiResponse)
             }
@@ -329,7 +380,7 @@ let setSubTaskStatus = (req, res) => {
 // Edit comment
 let editSubTaskComment = (req, res) => {
 
-    taskModel.updateOne({ 'taskId': req.params.taskId, 'subTask._id': req.body.subTask_id },
+    taskModel.findOneAndUpdate({ 'taskId': req.params.taskId, 'subTask._id': req.body.subTask_id },
         { $set: { 'subTask.$.comments': { body: req.body.body } } }, (err, result) => {
             if (err) {
                 console.log(err)
@@ -341,6 +392,13 @@ let editSubTaskComment = (req, res) => {
                 let apiResponse = response.generate(true, 'No task Found', 404, null)
                 res.send(apiResponse)
             } else {
+                let subTask = result.subTask.filter(task => task._id == req.body.subTask_id)[0];
+                let commentBodyBeforeEdit = subTask.comments.filter(comment => comment._id == req.body.comment_id)[0].body;
+                undoReq = {
+                    body: { comment_id: req.body.comment_id, body: commentBodyBeforeEdit },
+                    params: { taskId: req.params.taskId }
+                }
+                undoStack.push({ action: () => editSubTaskComment(undoReq) });
                 let apiResponse = response.generate(false, 'Comment edited', 200, result)
                 res.send(apiResponse)
             }
@@ -354,12 +412,12 @@ let deleteTask = (req, res) => {
 
     let removeTaskFromList = () => {
         return new Promise((resolve, reject) => {
-            if (check.isEmpty(req.body.title && req.body.listId)) {
+            if (check.isEmpty(req.body.listId && req.params.taskId)) {
                 let apiResponse = response.generate(true, 'required parameters are missing', 403, null)
                 reject(apiResponse)
             } else {
                 listModel.findOneAndUpdate({ "listId": req.body.listId },
-                    { $pull: { tasks: taskId } },
+                    { $pull: { tasks: req.params.taskId } },
                     (error, result) => {
                         if (error) {
                             logger.error(`Error Occured : ${error}`, 'Database', 10)
@@ -375,28 +433,35 @@ let deleteTask = (req, res) => {
     }// end addTaskToList
 
     let removeTask = () => {
-        taskModel.findOneAndRemove({ 'taskId': req.params.taskId }).exec((err, result) => {
-            if (err) {
-                console.log(err)
-                logger.error(err.message, 'Task Controller: deletetask', 10)
-                let apiResponse = response.generate(true, 'Failed To delete task', 500, null)
-                reject(apiResponse)
-            } else if (check.isEmpty(result)) {
-                logger.info('No task Found', 'task Controller: deletetask')
-                let apiResponse = response.generate(true, 'No task Found', 404, null)
-                reject(apiResponse)
-            } else {
-                resolve(apiResponse)
-            }
-        });
+        return new Promise((resolve, reject) => {
+            taskModel.findOneAndUpdate({ 'taskId': req.params.taskId }, { 'removed': true }).exec((err, result) => {
+                if (err) {
+                    console.log(err)
+                    logger.error(err.message, 'Task Controller: deletetask', 10)
+                    let apiResponse = response.generate(true, 'Failed To delete task', 500, null)
+                    reject(apiResponse)
+                } else if (check.isEmpty(result)) {
+                    logger.info('No task Found', 'task Controller: deletetask')
+                    let apiResponse = response.generate(true, 'No task Found', 404, null)
+                    reject(apiResponse)
+                } else {
+                    resolve(result)
+                }
+            });
+        })
     }// end removeTask
 
     // promise call
-    removeTaskFromList()
+    return removeTaskFromList()
         .then(removeTask)
         .then((result) => {
-            let apiResponse = response.generate(false, 'Task deleted successfully', 200, result);
-            res.send(apiResponse);
+            if (res) {
+                undoStack.push({ action: () => reviveTask(req.body.listId, req.params.taskId) });
+                let apiResponse = response.generate(false, 'Task deleted successfully', 200, result);
+                res.send(apiResponse);
+            } else {
+                return result.data
+            }
         })
         .catch((err) => {
             console.log("error handler");
@@ -406,6 +471,48 @@ let deleteTask = (req, res) => {
         })
 
 }// end delete task
+
+let reviveTask = (listId, taskId) => {
+
+    let addTaskToList = () => {
+        return new Promise((resolve, reject) => {
+            listModel.findOneAndUpdate({ "listId": listId },
+                { $push: { tasks: taskId } },
+                (error, result) => {
+                    if (error) {
+                        logger.error(`Error Occured : ${error}`, 'Database', 10)
+                        reject(error)
+                    } else resolve()
+                });
+        })
+    }// end addTaskToList
+
+    let addTask = () => {
+        return new Promise((resolve, reject) => {
+            taskModel.findOneAndUpdate({ 'taskId': req.params.taskId }, { 'removed': false }).exec((err, result) => {
+                if (err) {
+                    console.log(err)
+                    logger.error(err.message, 'Task Controller: reviveTask', 10)
+                    reject()
+                } else if (check.isEmpty(result)) {
+                    logger.info('No task Found', 'task Controller: reviveTask')
+                    reject()
+                } else resolve()
+            });
+        })
+    }// end removeTask
+
+    // promise call
+    return removeTaskFromList()
+        .then(removeTask)
+        .catch((err) => {
+            console.log("error handler");
+            console.log(err);
+            res.status(err.status)
+            res.send(err)
+        })
+}// end reviveTask
+
 
 let deleteSubTask = (req, res) => {
     taskModel.updateOne(
@@ -419,16 +526,32 @@ let deleteSubTask = (req, res) => {
                 res.send(apiResponse);
             } else {
                 // result.comments.push(newComment)
-                console.log('Success in comment creation')
-                let apiResponse = response.generate(false, 'Comment created.', 200, result)
-                res.send(apiResponse);
+                console.log('Subtask deleted')
+                let apiResponse = response.generate(false, 'Subtask deleted', 200, result)
+                if (res) res.send(apiResponse);
             }
         });
-}
+}// emd  deleteSubTask
 
+let reviveSubTask = (listId, taskId) => {
+
+    taskModel.updateOne({ 'taskId': req.params.taskId }, { 'removed': false }).exec((err, result) => {
+        if (err) {
+            console.log(err)
+            logger.error(err.message, 'Task Controller: reviveTask', 10)
+            reject()
+        } else if (check.isEmpty(result)) {
+            logger.info('No task Found', 'task Controller: reviveTask')
+            reject()
+        } else resolve()
+    });
+
+}// end reviveTask
 
 // Delete task
 let deleteComment = (req, res) => {
+    console.log('TASK ID>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', req.params.taskId)
+    console.log('COMMENT ID>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>', req.body.comment_id)
     taskModel.updateOne(
         { taskId: req.params.taskId },
         { $pull: { comments: { _id: req.body.comment_id } } },
@@ -441,7 +564,7 @@ let deleteComment = (req, res) => {
             } else {
                 console.log('comment deleted')
                 let apiResponse = response.generate(false, 'Comment created.', 200, result)
-                res.send(apiResponse);
+                if (res) res.send(apiResponse);
             }
         });
 
@@ -487,6 +610,7 @@ module.exports = {
     deleteTask: deleteTask,
     deleteSubTask: deleteSubTask,
     deleteComment: deleteComment,
-    deleteSubTaskComment: deleteSubTaskComment
+    deleteSubTaskComment: deleteSubTaskComment,
+    undo: undo
 
 }// end exports

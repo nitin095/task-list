@@ -9,9 +9,9 @@ import { toASCII } from 'punycode';
 })
 export class AppService {
 
-  private baseUrl = 'http://ec2-13-233-92-229.ap-south-1.compute.amazonaws.com/api/v1';
+  // private baseUrl = 'http://ec2-13-233-92-229.ap-south-1.compute.amazonaws.com/api/v1';
 
-  // private baseUrl = 'http://localhost:3000/api/v1';
+  private baseUrl = 'http://localhost:3000/api/v1';
 
   private authToken: string = Cookie.get('authtoken');
 
@@ -111,7 +111,7 @@ export class AppService {
   }
 
   addTaskComment(taskId, comment): Observable<any> {
-    let response = this._http.post(`${this.baseUrl}/tasks/comment/create/${taskId}`, comment)
+    let response = this._http.post(`${this.baseUrl}/tasks/comment/create/${taskId}?authToken=${this.authToken}`, comment)
     return response
   }
 
@@ -130,8 +130,8 @@ export class AppService {
     return response
   }
 
-  deleteTask(taskId): Observable<any> {
-    let response = this._http.post(`${this.baseUrl}/tasks/${taskId}/delete?authToken=${this.authToken}`, '')
+  deleteTask(listId, taskId): Observable<any> {
+    let response = this._http.post(`${this.baseUrl}/tasks/${taskId}/delete?authToken=${this.authToken}`, { listId: listId })
     return response
   }
 
@@ -145,13 +145,13 @@ export class AppService {
     return response
   }
 
-  deleteSubTask(taskId,subTask_id): Observable<any> {
-    let response = this._http.post(`${this.baseUrl}/tasks/${taskId}/${subTask_id}/delete?authToken=${this.authToken}`,'')
+  deleteSubTask(taskId, subTask_id): Observable<any> {
+    let response = this._http.post(`${this.baseUrl}/tasks/${taskId}/${subTask_id}/delete?authToken=${this.authToken}`, '')
     return response
   }
 
   setSubTaskStatus(taskId, subTask_id, isDone): Observable<any> {
-    let response = this._http.put(`${this.baseUrl}/tasks/${taskId}/${subTask_id}/status?authToken=${this.authToken}`, {isDone: isDone})
+    let response = this._http.put(`${this.baseUrl}/tasks/${taskId}/${subTask_id}/status?authToken=${this.authToken}`, { isDone: isDone })
     return response
   }
 
@@ -197,6 +197,11 @@ export class AppService {
 
   ignoreReceivedRequest(userId, friend): Observable<any> {
     let response = this._http.put(`${this.baseUrl}/users/${userId}/friends/ignore?authToken=${this.authToken}`, friend)
+    return response
+  }
+
+  undo(): Observable<any> {
+    let response = this._http.put(`${this.baseUrl}/tasks/undo`, '')
     return response
   }
 
