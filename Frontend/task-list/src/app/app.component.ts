@@ -55,8 +55,11 @@ export class AppComponent implements OnInit {
 
 
   getInitials() {
-    let initials = `${this.userDetails.firstName[0]}${this.userDetails.lastName[0]}`
-    return initials
+    if (this.userDetails) {
+      let initials = `${this.userDetails.firstName[0]}${this.userDetails.lastName[0]}`
+      return initials
+    }
+    else return ''
   }
 
   searchTasks(search) {

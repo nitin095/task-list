@@ -126,7 +126,7 @@ let forgotPassword = (req, res) => {
             let apiResponse = response.generate(true, 'No Email Found', 404, null)
             res.send(apiResponse)
         } else {
-            mailer.sendForgotPasswordEmail(req.body.email, randomToken, 'user')
+            mailer.sendForgotPasswordEmail(req.body.email, randomToken)
             let apiResponse = response.generate(false, 'Password change requested', 200, result)
             res.send(apiResponse)
         }

@@ -1,12 +1,13 @@
-<mat-progress-bar mode="indeterminate" *ngIf="showProgressBar" [style.opacity]="showProgressBar == true ? '1': '0'"></mat-progress-bar>
+<mat-progress-bar mode="indeterminate" [style.opacity]="showProgressBar == true ? '1': '0'"></mat-progress-bar>
 <div class="container">
   <div class="row main-section justify-content-around align-items-center">
     <div class="col">
       <div class="row p-0 justify-content-center">
-        <h1 class="lead pt-0 pb-4" style="font-size:2rem">Login to your account</h1>
+        <h1 *ngIf="!resetForm" class="lead pt-0 pb-4" style="font-size:2rem">Login to your account</h1>
+        <h1 *ngIf="resetForm" class="lead pt-0 pb-4" style="font-size:2rem">Reset your password</h1>
       </div>
       <div class="row justify-content-center">
-        <mat-card class="example-card col-auto mx-2">
+        <mat-card *ngIf="loginForm" class="col-auto mx-2">
           <mat-card-header>
             <mat-card-title>Enter email and password</mat-card-title>
           </mat-card-header>
@@ -30,9 +31,58 @@
             <button class="login-btn" mat-flat-button (click)="showProgressBar=true;login()">LOGIN</button>
           </mat-card-actions>
         </mat-card>
+        <mat-card *ngIf="forgotForm" class="col-auto col-md-4 mx-2">
+          <mat-card-header>
+            <mat-card-title style="display: inline-flex;align-items: center;">
+              <button mat-icon-button (click)="forgotForm=false;loginForm=true">
+                <mat-icon matRipple>arrow_back</mat-icon>
+              </button>
+              <span>Enter email</span>
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <form class="container">
+              <div class="row">
+                <mat-form-field class="col">
+                  <input matInput placeholder="Email" name='email' required [(ngModel)]="email" (keyup.enter)="forgotPassword()">
+                </mat-form-field>
+              </div>
+            </form>
+          </mat-card-content>
+          <mat-card-actions>
+            <button mat-flat-button class="recover-btn" (click)="forgotPassword()">RECOVER PASSWORD</button>
+          </mat-card-actions>
+        </mat-card>
+        <mat-card *ngIf="resetForm" class="col-auto col-md-4 mx-2">
+          <mat-card-header>
+            <mat-card-title>Set new password</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <form class="container">
+              <div class="row">
+                <mat-form-field class="col">
+                  <input matInput placeholder="Password" name="password" required type="text" [(ngModel)]="password">
+                </mat-form-field>
+              </div>
+              <div class="row">
+                <mat-form-field class="col">
+                  <input matInput placeholder="Retype password" name="retypePassword" required [type]="hide ? 'password' : 'text'"
+                    [(ngModel)]="retypePassword" (keyup.enter)="showProgressBar=true;resetPassword()">
+                  <mat-icon matSuffix (click)="hide = !hide">{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                </mat-form-field>
+              </div>
+            </form>
+          </mat-card-content>
+          <mat-card-actions>
+            <button class="reset-btn" mat-flat-button (click)="showProgressBar=true;resetPassword()">RESET PASSWORD</button>
+          </mat-card-actions>
+        </mat-card>
       </div>
-      <div class="row justify-content-center no-gutters">
-        <span class="lead mt-5" style="font-size:1rem">Don't have a account?<button mat-button color="primary"
+      <div class="row mt-5">
+        <span *ngIf="!resetForm" class="col-12 text-center lead" style="font-size:1rem"><button mat-button color="primary"
+            (click)="loginForm=false;forgotForm=true">Forgot
+            Password</button> </span>
+        <span class="col-12 lead text-center" style="font-size:1rem">Don't have a account?<button mat-button color="primary"
             [routerLink]="['/home']">Signup</button> </span>
       </div>
     </div>

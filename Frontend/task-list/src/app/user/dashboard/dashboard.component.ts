@@ -24,6 +24,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   showProgressBar = true;
   public userDetails = this.appService.getUserInfoFromLocalstorage();
   public lists = [];
+  public sharedLists = [];
   public activeList: any;
   public allTasks = [];
   public friends: any;
@@ -59,6 +60,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnInit() {
 
     this.getAllLists(true);
+    this.getSharedLists();
     this.getAllTasks();
 
     this._route.queryParams.subscribe(params => {
@@ -87,6 +89,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   makeListActive(list) {
+    this.showTasksList=true;
     this.activeList = list;
     this.getActiveListTasks(list.listId);
     this.calendarOptions = null;
@@ -178,16 +181,39 @@ export class DashboardComponent implements OnInit, OnDestroy {
     )
   }// end getAllLists
 
+  getSharedLists() {
+    console.log('GETTINGSHARED ISTS>>>>>>>>>.')
+    this.showProgressBar = true;
+    this.appService.getSharedLists(this.userDetails.userId).subscribe(
+      response => {
+        this.showProgressBar = false;
+        if (response.status === 200) {
+          this.sharedLists = response.data;
+          this.sharedLists.map(list => list.shared = true);
+          console.log(this.sharedLists)
+        } else {
+          this.snackBar.open(response.message, 'Close', { duration: 4000, });
+          console.log(response.message)
+        }
+      },
+      error => {
+        this.snackBar.open(error.error.message, 'Close', { duration: 4000, });
+        this.showProgressBar = false;
+        console.log("some error occured");
+        console.log(error)
+      }
+    )
+  }// end getSharedLists
+
   getAllTasks() {
     this.showProgressBar = true;
     this.appService.getAllTasks(this.userDetails.userId).subscribe(
       response => {
         this.showProgressBar = false;
         if (response.status === 200) {
-          console.log(response)
           this.allTasks = response.data;
-          this.allTasks.map(task => task.today = false);
           this.importantTasks = this.allTasks.filter(task => task.isImportant);
+          this.todayTasks = this.allTasks.filter(task => task.today);
           this.completedImportantTasks = this.importantTasks.filter(task => task.isDone).length;
           this.importantTasksProgress = (this.completedImportantTasks / this.importantTasks.length) * 100;
         } else {
@@ -249,7 +275,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         console.log(error)
       }
     )
-  }
+  }// end getActiveListTasks
 
   createNewTask(title) {
     this.showProgressBar = true;
@@ -307,10 +333,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   toggleMarkTaskToday(task) {
     this.todayTasks.includes(task) ? this.todayTasks.splice(this.todayTasks.indexOf(task), 1) : this.todayTasks.push(task)
+    this.saveTask({ today: task.today }, task.taskId)
   }
 
-  deleteTask(listId,taskId) {
-    this.appService.deleteTask(listId,taskId).subscribe(
+  deleteTask(listId, taskId) {
+    this.appService.deleteTask(listId, taskId).subscribe(
       response => {
         if (response.status === 200) {
           this.showTasksList = true;
@@ -328,7 +355,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         console.log(error)
       }
     )
-  }
+  }// end deleteTask
 
   saveSubTask(id, status) {
     // getting number of subtasks marked as done
@@ -346,7 +373,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         console.log(error)
       }
     )
-  }
+  }// end saveSubTask
 
   getSingleTask(taskId) {
     this.appService.getSingleTask(taskId).subscribe(
@@ -367,7 +394,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         console.log(error)
       }
     )
-  }
+  }// end getSingleTask
 
   addComment(comment) {
     let commentData = {
@@ -408,7 +435,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         console.log(error)
       }
     )
-  }
+  }// end deleteComment
 
   editComment(commentId, body) {
     let comment = {
@@ -432,7 +459,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         console.log(error)
       }
     )
-  }
+  }// end editComment
 
   createNewSubTask(title) {
     let data = {
@@ -455,7 +482,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         console.log(error)
       }
     )
-  }
+  }// createNewSubTask
 
   deleteSubTask(id) {
     this.appService.deleteSubTask(this.activeTask.taskId, id).subscribe(
@@ -473,7 +500,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         console.log(error)
       }
     )
-  }
+  }// deleteSubTask
 
   getFriends() {
 
@@ -495,7 +522,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     } else {
       this.snackBar.open('No friends. Add friends to share lists', 'Close', { duration: 4000, });
     }
-  }// end shareList
+  }// end getFriends
 
   shareList() {
     this.appService.editList(this.activeList.listId, { collaborators: this.selectedFriends }).subscribe(
@@ -513,7 +540,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         console.log(error)
       }
     )
-  }
+  }// end shareList
 
   loadCalender(): any {
 

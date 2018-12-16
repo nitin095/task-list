@@ -9,9 +9,9 @@ import { toASCII } from 'punycode';
 })
 export class AppService {
 
-  private baseUrl = 'http://ec2-13-233-92-229.ap-south-1.compute.amazonaws.com/api/v1';
+  // private baseUrl = 'http://ec2-13-233-92-229.ap-south-1.compute.amazonaws.com/api/v1';
 
-  // private baseUrl = 'http://localhost:3000/api/v1';
+  private baseUrl = 'http://localhost:3000/api/v1';
 
   private authToken: string = Cookie.get('authtoken');
 
@@ -92,6 +92,11 @@ export class AppService {
 
   getSingleList(listId): Observable<any> {
     let response = this._http.get(`${this.baseUrl}/lists/${listId}/details?authToken=${this.authToken}`)
+    return response
+  }
+
+  getSharedLists(userId): Observable<any> {
+    let response = this._http.get(`${this.baseUrl}/lists/shared/${userId}?authToken=${this.authToken}`)
     return response
   }
 

@@ -46,7 +46,7 @@ let createList = (req, res) => {
 // Get all list details 
 let getAllLists = (req, res) => {
 
-    listModel.find({"createdBy": req.params.userId})
+    listModel.find({ "createdBy": req.params.userId })
         .select(' -__v -_id')
         .lean()
         .exec((err, result) => {
@@ -92,6 +92,27 @@ let getSingleList = (req, res) => {
 
 }// end get single list
 
+
+let getSharedLists = (req, res) => {
+    listModel.find({ "collaborators": req.params.userId })
+        .select(' -__v -_id')
+        .lean()
+        .exec((err, result) => {
+            if (err) {
+                console.log(err)
+                logger.error(err.message, 'List Controller: getAllLists', 10)
+                let apiResponse = response.generate(true, 'Failed To Find List Details', 500, null)
+                res.send(apiResponse)
+            } else if (check.isEmpty(result)) {
+                logger.info('No List Found', 'List Controller: getAllLists')
+                let apiResponse = response.generate(true, 'No List Found', 404, null)
+                res.send(apiResponse)
+            } else {
+                let apiResponse = response.generate(false, 'Shared List(s) Found', 200, result)
+                res.send(apiResponse)
+            }
+        })
+}
 
 // Edit list
 let editList = (req, res) => {
@@ -143,6 +164,7 @@ module.exports = {
     createList: createList,
     getAllLists: getAllLists,
     getSingleList: getSingleList,
+    getSharedLists: getSharedLists,
     editList: editList,
     deleteList: deleteList
 

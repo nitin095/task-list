@@ -295,8 +295,6 @@ let getSingleTask = (req, res) => {
 
 // Edit task
 let editTask = (req, res) => {
-    console.log('REQUEST BODY ?????????????????????????????????????/')
-    console.log(req.body)
     let options = req.body;
     taskModel.findOneAndUpdate({ 'taskId': req.params.taskId }, options).exec((err, result) => {
         if (err) {
@@ -316,7 +314,7 @@ let editTask = (req, res) => {
                 params: { taskId: req.params.taskId }
             }
             undoStack.push({ action: () => editTask(undoReq) });
-            let apiResponse = response.generate(false, 'task details edited', 200, null)
+            let apiResponse = response.generate(false, 'task details edited', 200, result)
             if (res) res.send(apiResponse)
         }
     });

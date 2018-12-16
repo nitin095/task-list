@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div class="container-fluid main-container">
   <mat-progress-bar class="loader" mode="indeterminate" [style.opacity]="showProgressBar == true ? '1': '0'"></mat-progress-bar>
   <div class="row main-row">
 
@@ -24,6 +24,12 @@
       </div>
       <div class="vh10" (click)="drawer.open()">
         <mat-icon style="color: #197bd8">add</mat-icon>
+      </div>
+        <mat-divider></mat-divider>
+        <div class="vh4"></div>
+      <div class="vh10 side-nav-icon" *ngFor="let list of sharedLists" (click)="makeListActive(list);showTodayList=false;isActive.value=list.listId"
+        matTooltip="{{list.title}}">
+        <mat-icon [ngClass]="{'active': isActive.value==list.listId}">playlist_add</mat-icon>
       </div>
 
     </div>
@@ -56,13 +62,24 @@
           <div class="vh10" style="justify-content: flex-start">
             <span class="new-list-link"><input type="text" #title placeholder="New List" (keyup.enter)="createNewList(title.value);title.value=null"></span>
           </div>
+            <mat-divider></mat-divider>
+          <div class="vh4">
+              <small>Shared lists</small>
+          </div>
+          <div class="vh10" *ngFor="let list of sharedLists" style="justify-content: flex-start" (click)="makeListActive(list);isActive.value=list.listId"
+            [ngClass]="{'active-bg': isActive.value==list.listId}">
+            <div style="display: inline-flex;justify-content: space-between;width:100%">
+              <span>{{list.title}}</span>
+              <span>{{list.tasks.length}}</span>
+            </div>
+          </div>
 
         </mat-drawer>
         <!-- end drawer -->
 
 
         <!-- list view header -->
-        <div class="container list-header sticky-top" *ngIf="activeList">
+        <div class="container-fluid list-header sticky-top" *ngIf="activeList">
           <div class="row pt-4 justify-content-between">
             <div class="col-12 col-sm-auto">
               <div class="row px-4">
@@ -81,7 +98,7 @@
                     <small class="col-12" style="line-height:0.1rem">Undo</small>
                   </div>
                 </div>
-                <div class="col-3 col-sm-2 header-btn" (click)="getFriends()">
+                <div *ngIf="!activeList.shared" class="col-3 col-sm-2 header-btn" (click)="getFriends()">
                   <div class="row text-center p-0">
                     <div class="col-12 grey">
                       <mat-icon>person_add</mat-icon>
@@ -130,7 +147,7 @@
 
 
         <!-- tasks list view -->
-        <div class="container" *ngIf="activeList">
+        <div class="container-fluid" *ngIf="activeList">
 
           <div class="row" *ngIf="showTasksList">
 
@@ -390,7 +407,7 @@
 
 
         <!-- important tasks list view header -->
-        <div class="container list-header sticky-top" *ngIf="showImportantList">
+        <div class="container-fluid list-header sticky-top" *ngIf="showImportantList">
           <div class="row py-4 justify-content-between">
             <div class="col-12 col-sm-auto">
               <div class="row px-4">
@@ -427,7 +444,7 @@
 
 
         <!-- important tasks list view -->
-        <div class="container" *ngIf="importantTasks && showImportantList">
+        <div class="container-fluid" *ngIf="importantTasks && showImportantList">
           <div class="row" *ngIf="showImportantList">
 
             <div class="col-12">
@@ -459,7 +476,7 @@
 
 
         <!-- today tasks list view header -->
-        <div class="container list-header sticky-top" *ngIf="showTodayList">
+        <div class="container-fluid list-header sticky-top" *ngIf="showTodayList">
           <div class="row py-4 justify-content-between">
             <div class="col-12 col-sm-auto">
               <div class="row px-4">
@@ -486,7 +503,7 @@
 
 
         <!-- today tasks list view -->
-        <div class="container" *ngIf="todayTasks && showTodayList">
+        <div class="container-fluid" *ngIf="todayTasks && showTodayList">
           <div class="row" *ngIf="showTodayList">
 
             <div class="col-12">
@@ -520,7 +537,7 @@
 
 
         <!-- calender view -->
-        <div class="container">
+        <div class="container-fluid">
           <div class="row">
             <div class="col-12 calender-col">
               <div *ngIf="calendarOptions" style="height:90vh">
@@ -545,7 +562,7 @@
       <div class="col pt-2 display-4" style="font-size:1.8rem">Share '{{activeList.title}}' with</div>
     </div>
     <div class="row">
-      <div class="col-auto" *ngFor="let friend of friends">
+      <div class="col-auto m-2" *ngFor="let friend of friends">
         <div class="friend-chip" [ngClass]="{'selected-chip': selectedFriends.includes(friend.userId)}" (click)="selectedFriends.push(friend.userId)">{{friend.firstName}}
           {{friend.lastName}}</div>
       </div>

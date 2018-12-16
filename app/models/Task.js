@@ -91,6 +91,10 @@ let taskSchema = new Schema({
         type: Boolean,
         default: false
     },
+    today: {
+        type: Boolean,
+        default: false
+    },
     removed: {
         type: Boolean,
         default: false

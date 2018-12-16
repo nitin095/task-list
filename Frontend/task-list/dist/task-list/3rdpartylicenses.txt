@@ -934,13 +934,13 @@ MIT
 @angular/router
 MIT
 
-@angular/material/progress-bar
-
 @angular/material/card
 
 @angular/material/form-field
 
 @angular/material/icon
+
+@angular/material/progress-bar
 
 @angular/material/checkbox
 

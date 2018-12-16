@@ -1,4 +1,4 @@
-.container-fluid{
+.main-container{
     height:90vh;
     overflow: hidden;
     position: relative;
@@ -44,6 +44,18 @@ outline: none
     display: flex;
     justify-content: center;
     align-items: center;
+}
+.vh4{
+    height: 4vh;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+.vh4 small{
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+    color: grey
 }
 .flex-center{
     display: flex;

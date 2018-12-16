@@ -57,7 +57,7 @@ module.exports.setRouter = (app) => {
 	 */
 
 
-	app.get(`${baseUrl}/:listId/details`, listController.getSingleList);
+	app.get(`${baseUrl}/:listId/details`, auth.isAuthorized, listController.getSingleList);
 
     /**
 	 * @api {get} /api/v1/lists/:listId/details Get a single list
@@ -98,7 +98,48 @@ module.exports.setRouter = (app) => {
 	 */
 
 
-	app.post(`${baseUrl}/create`, listController.createList);
+	app.get(`${baseUrl}/shared/:userId`, auth.isAuthorized, listController.getSharedLists);
+
+    /**
+	 * @api {get} /api/v1/lists/:listId/details Get all lists shared with the user
+	 * @apiVersion 0.0.1
+	 * @apiGroup read
+	 *
+	 * @apiParam {String} authToken The token for authentication.(Send authToken as query parameter, body parameter or as a header)
+	 * @apiParam {String} userId The userId of the user should be passed as the URL parameter
+	 *
+	 *  @apiSuccessExample {json} Success-Response:
+	 *  {
+	    "error": false,
+	    "message": "List(s) Found Successfully.",
+	    "status": 200,
+	    "data": {
+					"tasks": [
+						"taskId1",
+						"taskId2"
+					],
+					"notes": "String",
+					"collaborators": [Array<string>],
+					"isDone": Boolean,
+					"listId": "String",
+					"createdBy": "String",
+					"title": "String",
+					"createdOn": "Date",
+					"lastModified": "Date"
+        		}
+	    }
+	  @apiErrorExample {json} Error-Response:
+	 *
+	 * {
+	    "error": true,
+	    "message": "Error Occured.",
+	    "status": 500,
+	    "data": null
+	   }
+	 */
+
+
+	app.post(`${baseUrl}/create`, auth.isAuthorized, listController.createList);
 
     /**
 	 * @api {post} /api/v1/lists/create Create new list
@@ -130,7 +171,7 @@ module.exports.setRouter = (app) => {
 
 
 
-	app.put(`${baseUrl}/:listId/edit`, listController.editList);
+	app.put(`${baseUrl}/:listId/edit`, auth.isAuthorized, listController.editList);
 
     /**
 	 * @api {put} /api/v1/lists/:listId/edit Edit list by listId
@@ -172,7 +213,7 @@ module.exports.setRouter = (app) => {
 	 */
 
 
-	app.post(`${baseUrl}/:listId/delete`, listController.deleteList);
+	app.post(`${baseUrl}/:listId/delete`, auth.isAuthorized, listController.deleteList);
 
     /**
 	 * @api {post} /api/v1/lists/delete Delete list by listId
