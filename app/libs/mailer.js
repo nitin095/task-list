@@ -20,7 +20,7 @@ let sendWelcomeMail = (userDetails) => {
         subject: `${userDetails.firstName}, welcome to your new Task List Account`,
         html: `<div style="background:whitesmoke;margin:50px;padding:15px;text-align:center"><h1>Hi ${userDetails.firstName}</h1><p>Your account has been created.
         Please login to create and view your lists.</p>
-        <p><a href="http://ec2-13-233-119-109.ap-south-1.compute.amazonaws.com"><button style="background:none;padding:5px 10px">LOGIN</button></a></p>
+        <p><a href="http://ec2-13-233-92-229.ap-south-1.compute.amazonaws.com/login"><button style="background:none;padding:5px 10px">LOGIN</button></a></p>
         <p><h4>Here’s what we have on file for you:</h4>
         Name: ${userDetails.firstName} ${userDetails.lastName}<br>Email: ${userDetails.email}<br>Phone: +${userDetails.countryCode} ${userDetails.mobileNumber}</p>
         <p>Yours sincerely<br>Task List</p>
@@ -96,7 +96,7 @@ let sendForgotPasswordEmail = (email, token) => {
         to: email,
         subject: `Reset your password`,
         html: ` <h3>Hi!</h3>
-        <p>You requested for a password reset, kindly use this <a href="http://ec2-13-233-119-109.ap-south-1.compute.amazonaws.com?token=${token}">link</a> to reset your password</p>
+        <p>You requested for a password reset, kindly use this <a href="http://ec2-13-233-92-229.ap-south-1.compute.amazonaws.com/login?token=${token}">link</a> to reset your password</p>
         <p>This link is valid for 30 minutes.</p>
         <br>
         <p>Cheers!<br>Task List</p>`
