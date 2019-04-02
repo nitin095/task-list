@@ -1,10 +1,6 @@
 # Task-List
 Real time to do list system
 
-View buid version here: http://ec2-13-233-92-229.ap-south-1.compute.amazonaws.com
-
-API -  http://ec2-13-233-92-229.ap-south-1.compute.amazonaws.com/api
-
 ## Project Description -
 This project is aimed to create a ready to deploy Live TODO List management system.
 It must have all the features mentioned below and it must be deployed on a server
